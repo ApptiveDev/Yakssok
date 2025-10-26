@@ -1,0 +1,70 @@
+
+/* 전체 홈 페이지 컨테이너 */
+.home-container {
+  display: flex;
+  background-color: #EAEEE0; /* Figma의 white 3 */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* 스크롤바 방지 */
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+  width: 122px; /* Figma에서 좌측 영역 너비 */
+  background-color: #EAEEE0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 38px;
+}
+
+/* 로고 컨테이너 */
+.logo-container {
+  /* 로고 스타일은 Figma Vector를 기반으로 하므로, 이미지 파일로 처리하는 것이 좋습니다. */
+  width: 55px;
+  height: 55px;
+  /* position: absolute; left: 33px; top: 38px; */
+}
+
+/* 네비게이션 메뉴 스타일 */
+.navigation {
+  margin-top: 154px; /* generate button과의 간격 */
+  width: 100%;
+}
+
+.navigation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 아이템 중앙 정렬 */
+  gap: 52px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 20px;
+  text-align: center;
+  color: #85837B; /* black 2 */
+}
+
+.nav-item.active {
+  color: #C4C5B7; /* black 3 */
+}
+
+/* 메인 캘린더 영역 스타일 */
+.main-content {
+  flex-grow: 1; /* 남은 공간을 모두 채움 */
+  background: #FAFFF2; /* Figma의 Rectangle 30 */
+  border-radius: 15px 0px 0px 15px;
+  padding: 24px; /* 기존 padding 유지 */
+  /* position: relative; */
+}
