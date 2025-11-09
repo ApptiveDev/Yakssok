@@ -1,6 +1,8 @@
 import React from 'react';
 import Calendar from '../components/Calendar';
 import SidebarLeft from '../components/SidebarLeft';
+import SidebarRight from '../components/SidebarRight';
+import { useState } from "react";
 import './Home.css';
 
 import LogoIcon from '../assets/LogoIcon';
@@ -82,6 +84,8 @@ const Home = () => {
     }
   ];
 
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="home-container">
       {/* Header */}
@@ -101,6 +105,14 @@ const Home = () => {
           events={sampleEvents}
         />
       </main>
+
+      <SidebarRight open={open} onClose={() => setOpen(false)}>
+        {/* 여기에 캘린더/시간 선택 컴포넌트 넣기 */}
+      </SidebarRight>
+      
+      {/*우측 사이드바 임시 버튼*/}
+      <button onClick={() => setOpen(true)}></button>
+      
     </div>
   );
 };
