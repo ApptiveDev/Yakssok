@@ -5,7 +5,7 @@ from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.models.appointment_model import Appointments, AppointmentDates
+from app.models.appointment_model import Appointments, AppointmentDates, Participations
 from app.schema.appointment_schema import AppointmentCreateRequest
 
 
@@ -50,6 +50,14 @@ class AppointmentService:
                 candidate_date=candidate_date
             )
             db.add(appointment_date)
+
+        # 생성자 참여자목록에 반영
+        creator_participation = Participations(
+            user_id=creator_id,
+            appointment_id=appointment.id,
+            status='ATTENDING'
+        )
+        db.add(creator_participation)
 
         await db.commit()
         await db.refresh(appointment)
