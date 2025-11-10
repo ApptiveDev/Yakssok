@@ -115,11 +115,19 @@ const SidebarLeft = ({ events = [] }) => {
   };
 
   // 약속 목록 상태
-  const appointments = events.map((e, idx) => ({
-    id: idx + 1,
-    text: e.title,
-    date: e.start.slice(0, 10),
-  }));
+  const appointments = events
+    .map((e, idx) => ({
+      id: idx + 1,
+      text: e.title,
+      date: e.start.slice(0, 10),
+    }))
+    .filter((app) => {
+      const appDate = new Date(app.date);
+      return (
+        appDate.getFullYear() === currentYear &&
+        appDate.getMonth() === currentMonth
+      );
+    });
 
   return (
     <>
