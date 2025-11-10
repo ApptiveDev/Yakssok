@@ -136,6 +136,8 @@ const Calendar = ({ events }) => {
 
   // 날짜 셀 안에 숫자 표시
   const renderDayCellContent = (info) => {
+    if (info.view.type === 'timeGridWeek') return null;
+
     return (
       <div className="custom-day-cell">
         <div className="date-container">
@@ -159,7 +161,7 @@ const Calendar = ({ events }) => {
         // 최대 2개만 표시
         eventsForDay.slice(0, 2).forEach((ev, index) => {
           const item = createEventItem(ev.title, index); // 약속 이름 동적으로 bottom 값 조정
-          eventBox.appendChild(item);   // 날짜 비교 함수
+          eventBox.appendChild(item);  
         });
 
         info.el.querySelector('.fc-daygrid-day-frame')?.appendChild(eventBox);

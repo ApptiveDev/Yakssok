@@ -559,7 +559,6 @@ button, .custom-header span, .fc-col-header-cell-cushion {
 }
 
 .weekly-header-dayname {
-  font-family: 'Pretendard', sans-serif;
   font-weight: 500;
   font-size: 13px;
   line-height: 20px;
@@ -651,8 +650,8 @@ button, .custom-header span, .fc-col-header-cell-cushion {
 
 /* 시간 슬롯에 수평선 추가 */
 .fc-timegrid-slot-lane:last-of-type {
-  border-top: 0.5px solid #948979;  /* 중앙에 수평선 */
-  border-bottom: 0.5px solid #948979; /* 중앙에 수평선 */
+  border-top: 0.5px solid #C4C5B7;  /* 중앙에 수평선 */
+  border-bottom: 0.5px solid #C4C5B7; /* 중앙에 수평선 */
 }
 
 /* 마지막 슬롯에서 수평선 제거 */
@@ -663,7 +662,7 @@ button, .custom-header span, .fc-col-header-cell-cushion {
 /* 시간 슬롯 높이 및 기타 설정 */
 .fc-timegrid-slot-lane {
   height: 120px; /* 슬롯의 높이 */
-  border-bottom: 0.5px solid #948979; /* 수평선 색상 */
+  border-bottom: 0.5px solid #C4C5B7; /* 수평선 색상 */
 }
 
 
