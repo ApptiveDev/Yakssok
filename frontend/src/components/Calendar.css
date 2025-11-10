@@ -193,6 +193,29 @@ button, .custom-header span, .fc-col-header-cell-cushion {
   color: #BEBEBE;
 }
 
+/* 월간 캘린더 헤더 */
+.fc-col-header-cell {
+  height: 80px; 
+}
+
+.fc-col-header-cell .monthly-header-dayname {
+  font-size: 16px;  
+  line-height: 60px;  
+}
+
+/* 월간 캘린더 그리드 */
+.fc-daygrid-body-unbalanced td {
+  border-bottom: 0.5px solid #C4C5B7; 
+}
+.fc-daygrid-body-unbalanced tr:last-child td {
+  border-bottom: none; 
+}
+
+
+
+
+
+
 
 /* ---------------------------------------------------- /
 / 약속(이벤트) 스타일 /
@@ -298,23 +321,29 @@ button, .custom-header span, .fc-col-header-cell-cushion {
 
 .event-box {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
   right: 0;
   bottom: 0; 
+  transform: translateY(-50%);
   background: #BBCEA0;
   border-radius: 12px;
+  box-shadow: 0px 3px 3px rgba(62, 62, 62, 0.05);
   padding: 6px 8px;
   color: white;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
 }
 
 .event-item {
   font-size: 13px;
   line-height: 18px;
+  margin-bottom: 5px;
   text-align: left;
+  bottom: 5px;
 }
 
 /* 지난 일정 */
