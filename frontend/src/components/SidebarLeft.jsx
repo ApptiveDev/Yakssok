@@ -12,7 +12,7 @@ import MyCalendarIconSelected from "../assets/MyCalendarIconSelected";
 import ListIconSelected from "../assets/ListIconSelected";
 import profileImage from "../assets/profile.jpg";
 
-const Sidebar = ({ events = [] }) => {
+const SidebarLeft = ({ events = [] }) => {
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
 
@@ -127,12 +127,11 @@ const Sidebar = ({ events = [] }) => {
         <div className="sidebar-overlay" onClick={() => setIsOpen(false)}></div>
       )}
 
-      <div ref={sidebarRef} className={`sidebar ${isOpen ? "open" : "closed"}`}>
-        <div className="logo">
-          <LogoIcon />
-        </div>
-
-        <div className="logo">
+      <div
+        ref={sidebarRef}
+        className={`sidebarLeft ${isOpen ? "open" : "closed"}`}
+      >
+        <div className="sidebarLeftLogo">
           <LogoIcon />
         </div>
 
@@ -159,7 +158,10 @@ const Sidebar = ({ events = [] }) => {
             )}
             <span className="iconText">약속 달력</span>
           </button>
-          <button className="iconButton" onClick={() => navigate("/mycalendar")}>
+          <button
+            className="iconButton"
+            onClick={() => navigate("/mycalendar")}
+          >
             {location.pathname === "/calendar" ? (
               <MyCalendarIconSelected />
             ) : (
@@ -227,4 +229,4 @@ const Sidebar = ({ events = [] }) => {
   );
 };
 
-export default Sidebar;
+export default SidebarLeft;
