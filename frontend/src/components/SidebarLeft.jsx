@@ -134,7 +134,7 @@ const SidebarLeft = ({ events = [] }) => {
         </div>
 
         {/* 새로운 약속 생성 버튼 */}
-        <button className="newButton" onClick={() => navigate("/new")}>
+        <button className="newButton" onClick={() => navigate("/create")}>
           {isOpen ? (
             <div className="buttonIcon">
               <NewButton />
