@@ -2,13 +2,14 @@ import * as React from "react";
 const OpenButton = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={48}
-    height={48}
+    width={35}
+    height={35}
+    viewBox="0 0 48 48"
     fill="none"
     {...props}
   >
     <path
-      stroke="#1E1E1E"
+      stroke="#C4C5B7"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={4}

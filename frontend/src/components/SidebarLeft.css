@@ -1,3 +1,8 @@
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 /* --- 사이드바 컨테이너 --- */
 .sidebarLeft {
   position: relative;
@@ -50,6 +55,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .sidebarLeftLogo:not(.open):hover .logoIcon {
   opacity: 0;
   pointer-events: none;
@@ -292,7 +298,6 @@
   width: 6px;
 }
 
-/* 스크롤 thumb에 SVG 이미지 넣기 */
 .appointmentsBox::-webkit-scrollbar-thumb {
   background-image: url("data:image/svg+xml,%3Csvg width='3' height='63' viewBox='0 0 3 63' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='1.25' y1='1.25' x2='1.25' y2='61.75' stroke='%23C4C5B7' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
