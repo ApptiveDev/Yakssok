@@ -3,6 +3,7 @@ import './Create.css';
 import { useNavigate } from "react-router-dom";
 import SidebarLeft from '../components/SidebarLeft';
 import SelectRange from '../components/SelectRange'; 
+import LinkPopup from "../components/LinkPopup";
 import logoImage from "../assets/createLogo.png";
 
 const Create = () => {
@@ -15,6 +16,18 @@ const Create = () => {
     const isFormValid = title.trim().length > 0 &&
                         Number(number) > 0 &&
                         selectedDates.size > 0;
+
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [shareLink, setShareLink] = useState("");
+
+    const handleSubmit = () => {
+        if (!isFormValid) return;
+
+        const fakeLink = `http://yakssok111.com`;
+        setShareLink(fakeLink);
+        setIsPopupOpen(true);
+    };
+
 
     return (
         <div className='create-container'>
@@ -58,11 +71,16 @@ const Create = () => {
                                 number,
                                 dates: [...selectedDates],
                             });
-                            // 링크 생성 팝업
+                            handleSubmit(); 
                         }}
                     >
                         {isFormValid ? "약속 만들기" : "아직 비어있는 칸이 있어요"}
                     </button>
+                    <LinkPopup
+                        open={isPopupOpen}
+                        link={shareLink}
+                        onClose={() => setIsPopupOpen(false)}
+                    />
                 </form>
             </main>
             
