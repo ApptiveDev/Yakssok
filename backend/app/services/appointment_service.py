@@ -87,3 +87,65 @@ class AppointmentService:
             select(AppointmentDates).where(AppointmentDates.appointment_id == appointment_id)
         )
         return result.scalars().all()
+
+    @staticmethod
+    async def join_appointment(invite_code: str, user_id: int, db: AsyncSession) -> Participations:
+        # 초대 코드로 약속 참여
+
+        # 약속 조회
+        appointment = await AppointmentService.get_appointment_by_invite_code(invite_code, db)
+        if not appointment:
+            raise ValueError("존재하지 않는 약속입니다")
+
+        # 약속 상태 확인
+        if appointment.status != 'VOTING':
+            raise ValueError("참여할 수 없는 약속입니다")
+
+        # 이미 참여했는지 확인
+        existing = await AppointmentService._get_participation(
+            user_id, appointment.id, db
+        )
+        if existing:
+            raise ValueError("이미 참여한 약속입니다")
+
+        # 최대 참여자 수 확인
+        if appointment.max_participants:
+            current_count = await AppointmentService._get_participation_count(
+                appointment.id, db
+            )
+            if current_count >= appointment.max_participants:
+                raise ValueError("참여 인원이 가득 찼습니다")
+
+        # 참여자 추가
+        participation = Participations(
+            user_id=user_id,
+            appointment_id=appointment.id,
+            status='ATTENDING'
+        )
+        db.add(participation)
+        await db.commit()
+        await db.refresh(participation)
+
+        return participation
+
+    @staticmethod
+    async def _get_participation(user_id: int, appointment_id: int, db: AsyncSession) -> Participations:
+        # 특정 사용자의 참여 정보 조회
+        result = await db.execute(
+            select(Participations).where(
+                Participations.user_id == user_id,
+                Participations.appointment_id == appointment_id
+            )
+        )
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def _get_participation_count(appointment_id: int, db: AsyncSession) -> int:
+        # 약속의 참여자 수 조회
+        from sqlalchemy import func
+        result = await db.execute(
+            select(func.count(Participations.id)).where(
+                Participations.appointment_id == appointment_id
+            )
+        )
+        return result.scalar()

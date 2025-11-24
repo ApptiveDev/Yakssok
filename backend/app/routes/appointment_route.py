@@ -4,7 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.services.appointment_service import AppointmentService
-from app.schema.appointment_schema import AppointmentCreateRequest, AppointmentResponse
+from app.schema.appointment_schema import (
+    AppointmentCreateRequest,
+    AppointmentResponse,
+    JoinAppointmentRequest,
+    ParticipationResponse
+)
 from app.utils.jwt import get_current_user
 
 security = HTTPBearer()
@@ -70,3 +75,30 @@ async def get_appointment_by_invite_code(
         invite_link=appointment.invite_link,
         candidate_dates=[ad.candidate_date for ad in appointment_dates]
     )
+
+
+@router.post("/join", response_model=ParticipationResponse)
+async def join_appointment(
+    request: JoinAppointmentRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    # 초대 코드로 약속 참여
+    try:
+        participation = await AppointmentService.join_appointment(
+            invite_code=request.invite_code,
+            user_id=current_user["sub"],
+            db=db
+        )
+
+        return ParticipationResponse(
+            id=participation.id,
+            user_id=participation.user_id,
+            appointment_id=participation.appointment_id,
+            status=participation.status
+        )
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"약속 참여 실패: {str(e)}")

@@ -29,3 +29,17 @@ class AppointmentDateResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class JoinAppointmentRequest(BaseModel):
+    invite_code: str
+
+
+class ParticipationResponse(BaseModel):
+    id: int
+    user_id: int
+    appointment_id: int
+    status: str
+
+    class Config:
+        from_attributes = True
