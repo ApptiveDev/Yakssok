@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Create.css';
 import { useNavigate } from "react-router-dom";
 import SidebarLeft from '../components/SidebarLeft';
+import SelectRange from '../components/SelectRange'; 
 import logoImage from "../assets/createLogo.png";
 
 const Create = () => {
@@ -9,10 +10,15 @@ const Create = () => {
 
     const sampleEvents = []; 
     const [title, setTitle] = useState(""); 
+    const [number, setNumber] = useState(0);
+    const [selectedDates, setSelectedDates] = useState(new Set());
+    const isFormValid = title.trim().length > 0 &&
+                        Number(number) > 0 &&
+                        selectedDates.size > 0;
 
     return (
         <div className='create-container'>
-            {/* <SidebarLeft events={sampleEvents} /> */}
+            <SidebarLeft events={sampleEvents} />
             <main className='main-content'>
                 <img src={logoImage} alt="logoImage" className='logoImage'/>
                 <br/>
@@ -34,10 +40,29 @@ const Create = () => {
                             className="number-box"
                             min="0"
                             max="10"
+                            value={number}
+                            onChange={(e) => setNumber(e.target.value)}
                         />
                         <span className='num-index-2'>명</span>
                     </div>
                     <p className='request-text'>어느 기간 안에서<br/>약속을 정하면 좋을까요?</p>
+                    <SelectRange value={selectedDates} onChange={setSelectedDates} />
+                    <button
+                        type="button"
+                        className="submit-button"
+                        disabled={!isFormValid}
+                        onClick={() => {
+                            if (!isFormValid) return;
+                            console.log("제출 데이터:", {
+                                title,
+                                number,
+                                dates: [...selectedDates],
+                            });
+                            // 링크 생성 팝업
+                        }}
+                    >
+                        {isFormValid ? "약속 만들기" : "아직 비어있는 칸이 있어요"}
+                    </button>
                 </form>
             </main>
             

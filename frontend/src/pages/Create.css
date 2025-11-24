@@ -121,3 +121,26 @@
     font-weight: 300;
     color: #1F1F1F; 
 }
+
+.submit-button {
+  width: 342px;
+  height: 60px;
+  border: none;
+  border-radius: 15px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 0px;
+  margin-bottom: 150px;
+
+  background: #1F1F1F;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.submit-button:disabled {
+  background: #EAEEE0;
+  color: #85837B;
+  cursor: not-allowed;
+}
