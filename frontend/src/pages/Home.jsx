@@ -6,12 +6,6 @@ import SidebarRight from '../components/SidebarRight';
 import { useState } from "react";
 import './Home.css';
 
-import LogoIcon from '../assets/LogoIcon';
-import NewButton from "../assets/NewButton";
-import CalendarIcon from "../assets/CalendarIcon";
-import MyCalendarIcon from "../assets/MyCalendarIcon";
-import ListIcon from "../assets/ListIcon";
-
 // const googleCalendarApiKey = process.env.REACT_APP_GOOGLE_CALENDAR_API_KEY;
 // const googleCalendarId = process.env.REACT_APP_GOOGLE_CALENDAR_ID;
 
