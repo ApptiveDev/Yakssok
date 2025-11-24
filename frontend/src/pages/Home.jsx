@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; 
 import Calendar from '../components/Calendar';
 import SidebarLeft from '../components/SidebarLeft';
 import SidebarRight from '../components/SidebarRight';
@@ -48,8 +49,8 @@ const Home = () => {
     },
     { 
       title: '11월 약속 6', 
-      start: '2025-11-25T10:30:00', 
-      end: '2025-11-25T13:00:00', 
+      start: '2025-11-24T10:30:00', 
+      end: '2025-11-24T13:00:00', 
       className: 'color-point-3'
     },
     { 
@@ -84,8 +85,8 @@ const Home = () => {
     },
     { 
       title: '12월 약속 1', 
-      start: '2025-12-03T13:30:00', 
-      end: '2025-12-03T15:00:00', 
+      start: '2025-12-02T13:30:00', 
+      end: '2025-12-02T15:00:00', 
       className: 'color-point-3'
     },
     { 
@@ -124,6 +125,11 @@ const Home = () => {
       
       {/*우측 사이드바 임시 버튼*/}
       <button onClick={() => setOpen(true)}></button>
+
+      {/* 파티원의 초대 페이지로 이동하는 임시 링크 */}
+      <Link to="/Invited" state={{ events: sampleEvents }}>
+        link
+      </Link>
       
     </div>
   );
