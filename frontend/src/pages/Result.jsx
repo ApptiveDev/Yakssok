@@ -1,0 +1,134 @@
+import React from "react";
+import SidebarLeft from "../components/SidebarLeft";
+import SidebarRight from "../components/SidebarRight";
+import "./Result.css";
+
+const Result = () => {
+  const sampleEvents = [
+    {
+      title: "11월 약속 1",
+      start: "2025-11-07T09:00:00",
+      end: "2025-11-07T11:00:00",
+      className: "color-point-1",
+    },
+    {
+      title: "11월 약속 2",
+      start: "2025-11-08T19:00:00",
+      end: "2025-11-08T21:00:00",
+      className: "color-point-2",
+    },
+    {
+      title: "11월 약속 3",
+      start: "2025-11-09T16:30:00",
+      end: "2025-11-09T18:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 4",
+      start: "2025-11-10T16:30:00",
+      end: "2025-11-10T18:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 5",
+      start: "2025-11-10T10:30:00",
+      end: "2025-11-10T13:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 6",
+      start: "2025-11-25T10:30:00",
+      end: "2025-11-25T13:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 7",
+      start: "2025-11-26T10:30:00",
+      end: "2025-11-26T13:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 8",
+      start: "2025-11-27T10:30:00",
+      end: "2025-11-27T13:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 9",
+      start: "2025-11-29T10:30:00",
+      end: "2025-11-29T13:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 10",
+      start: "2025-11-29T17:30:00",
+      end: "2025-11-29T19:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "11월 약속 11",
+      start: "2025-11-29T13:30:00",
+      end: "2025-11-29T15:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "12월 약속 1",
+      start: "2025-12-03T13:30:00",
+      end: "2025-12-03T15:00:00",
+      className: "color-point-3",
+    },
+    {
+      title: "12월 약속 2",
+      start: "2025-12-05T13:30:00",
+      end: "2025-12-05T15:00:00",
+      className: "color-point-3",
+    },
+  ];
+  const sampleResult = [
+    { id: 1, start: "2025-12-08T14:00:00" },
+    { id: 2, start: "2025-12-12T15:00:00" },
+    { id: 3, start: "2025-12-23T13:00:00" },
+  ];
+
+  const formatDate = (iso) => {
+    const d = new Date(iso);
+    return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+  };
+
+  const formatTime = (iso) => {
+    const d = new Date(iso);
+    const hour = d.getHours();
+    const meridiem = hour < 12 ? "오전" : "오후";
+    const h = hour % 12 === 0 ? 12 : hour % 12;
+    return `${meridiem} ${String(h).padStart(2, "0")}시`;
+  };
+
+  return (
+    <div className="resultPage">
+      <SidebarLeft events={sampleEvents} />
+
+      <div className="resultContainer">
+        <div className="resultContent">
+          <div className="resultText">
+            약속하기 좋은 시간대<br />약쏙이 골라봤어요.
+          </div>
+
+          <div className="resultList">
+            {sampleResult.map((item, index) => (
+              <div
+                key={item.id}
+                className={`resultCard ${index === 0 ? "active" : ""}`}
+              >
+                <div className="resultNum">{index + 1}</div>
+                <div className="resultDate">{formatDate(item.start)}</div>
+                <div className="resultTime">{formatTime(item.start)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Result;

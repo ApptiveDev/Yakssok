@@ -1,0 +1,88 @@
+/* --- 전체 페이지 레이아웃 --- */
+.resultPage {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --- 메인 컨테이너 --- */
+.resultContainer {
+  flex: 1;
+  background-color: #FAFFF2;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 중앙 내용 --- */
+.resultContent {
+  flex: 1;
+  text-align: center;
+  padding-top: 60px;
+}
+
+.resultTitle {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+}
+
+.resultText {
+  margin-top: 6px;
+  font-size: 18px;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* --- 결과 카드 리스트 --- */
+.resultList {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+/* --- 기본 카드 스타일 --- */
+.resultCard {
+  width: 80%;
+  max-width: 480px;
+  padding: 20px 26px;
+  border-radius: 16px;
+  background: #e5e7db;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  transition: 0.25s ease;
+}
+
+/* --- 활성 카드 (1등 카드) --- */
+.resultCard.active {
+  background: #ffffff;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.08);
+  transform: scale(1.02);
+}
+
+/* --- 숫자 박스 --- */
+.resultNum {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: #d5d6ce;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  color: #333;
+}
+
+/* --- 날짜 / 시간 텍스트 --- */
+.resultDate,
+.resultTime {
+  font-size: 20px;
+  color: #333;
+  font-weight: 500;
+}
