@@ -220,7 +220,7 @@ const Invited = () => {
         ) : (
           // 일반 모드 헤더
           <>
-            <div className="sidebarLeftLogo"> <LogoIconWhite /> </div>
+            <div className="invitedSidebarLogo"> <LogoIconWhite /> </div>
             <h1>{partyName}</h1>
             <p>{partyName}에 초대되었어요</p>
             <p>약속 범위 안에서 나의 일정이예요</p>

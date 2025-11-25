@@ -37,23 +37,23 @@ const CreateEvent = ({ date, onSave, onCancel }) => {
         return;
     }
 
-    // 1. 시작 시간 Date 객체 생성
+    // 시작 시간 Date 객체 생성
     const newStartDate = new Date(date);
     const [startH, startM] = startTime.split(':').map(Number);
     newStartDate.setHours(startH, startM);
 
-    // 2. 종료 시간 Date 객체 생성
+    // 종료 시간 Date 객체 생성
     const newEndDate = new Date(date);
     const [endH, endM] = endTime.split(':').map(Number);
     newEndDate.setHours(endH, endM);
 
-    // 종료 시간이 시작 시간보다 빠른 경우 방어 코드 (선택사항)
+    // 종료 시간이 시작 시간보다 빠른 경우 방어 코드
     if (newEndDate < newStartDate) {
       alert("종료 시간이 시작 시간보다 빠를 수 없습니다.");
       return;
     }
 
-    // 3. 부모에게 전달 (start, end 모두 포함)
+    // 부모에게 전달 (start, end 모두 포함)
     onSave({
       title,
       start: newStartDate,
@@ -98,7 +98,6 @@ const CreateEvent = ({ date, onSave, onCancel }) => {
           />
         </div>
 
-        {/* 👇 [수정됨] 시간 입력 영역 (가로 배치) */}
         <div className="input-group">
           <label>약속 시간</label>
           <div className="time-range-wrapper">
