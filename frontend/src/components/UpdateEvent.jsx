@@ -121,6 +121,7 @@ const UpdateEvent = ({ event, onSave, onCancel }) => {
               className="time-input"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
+              onClick={(e) => e.target.showPicker?.()}
             />
             <span className="time-separator">~</span>
             <input 

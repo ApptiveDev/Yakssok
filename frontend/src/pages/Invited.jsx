@@ -34,6 +34,10 @@ const Invited = () => {
   // 팝업 메뉴 상태
   const [activeMenuId, setActiveMenuId] = useState(null);
 
+  // 👇 [추가됨] 팝업 위치 및 타겟 날짜 저장
+  const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
+  const [menuTargetDate, setMenuTargetDate] = useState(null);
+
   // 화면 모드: 'list', 'create', 'update', 'delete'
   const [viewMode, setViewMode] = useState('list');
 
@@ -74,30 +78,50 @@ const Invited = () => {
     setFilteredEvents(filtered); 
   }, [allEvents, partyDateRange]); 
 
-  const getEventTitleForDate = (date) => {
+  // 해당 날짜의 이벤트 배열 반환
+  const getEventsForDate = (date) => {
     const targetDate = new Date(date);
     targetDate.setHours(0, 0, 0, 0);
 
-    const eventForDate = filteredEvents.filter(event => {
+    return filteredEvents.filter(event => {
       const eventDate = new Date(event.start);
       eventDate.setHours(0, 0, 0, 0);
       return eventDate.getTime() === targetDate.getTime(); 
     });
-
-    return eventForDate.length > 0 
-      ? eventForDate.map(event => event.title).join(", ") 
-      : "약속 없음";
   };
   
-  const toggleMenu = (dateMs) => {
-    // 삭제 
+  // 날짜별 이벤트 제목 문자열 반환 (수정/삭제 등에서 사용)
+  const getEventTitleForDate = (date) => {
+    const dayEvents = getEventsForDate(date);
+    return dayEvents.length > 0 
+      ? dayEvents.map(e => e.title).join(", ") 
+      : "약속 없음";
+  };
+
+  // 👇 [수정됨] 메뉴 토글 함수 (위치 계산 포함)
+  const toggleMenu = (e, date) => {
+    e.stopPropagation(); 
+
     if (viewMode === 'delete') return;
 
+    const dateMs = date.getTime();
+
+    // 이미 열려있는 메뉴를 다시 누르면 닫기
     if (activeMenuId === dateMs) {
       setActiveMenuId(null);
-    } else {
-      setActiveMenuId(dateMs);
+      return;
     }
+
+    // 클릭한 버튼의 위치 계산
+    const eventBox = e.currentTarget.closest('.event-box');
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPopupPos({
+      top: rect.top -155, // 버튼 바로 아래
+      left: rect.left + 50 // 버튼 오른쪽 끝에 맞춰서 왼쪽으로 정렬 (팝업 너비 고려)
+    });
+
+    setMenuTargetDate(date);
+    setActiveMenuId(dateMs);
   };
 
   // 추가
@@ -107,14 +131,16 @@ const Invited = () => {
     setActiveMenuId(null);
   };
 
-  //수정
-  const handleEditClick = (date, eventTitle) => {
+  // 수정
+  const handleEditClick = (date, eventTitleString) => {
+    // 문자열에 포함된 제목을 가진 이벤트를 찾음 (간단한 로직)
+    // 실제로는 ID나 정확한 매칭을 사용하는 것이 더 안전함
     const targetEvent = allEvents.find(event => {
       const eDate = new Date(event.start);
       eDate.setHours(0,0,0,0);
       const dDate = new Date(date);
       dDate.setHours(0,0,0,0);
-      return eDate.getTime() === dDate.getTime() && eventTitle.includes(event.title);
+      return eDate.getTime() === dDate.getTime() && eventTitleString.includes(event.title);
     });
 
     if (targetEvent) {
@@ -126,22 +152,21 @@ const Invited = () => {
     }
   };
 
-  // 삭제
+  // 삭제 모드 진입
   const enterDeleteMode = (date) => {
-    const title = getEventTitleForDate(date);
-    if (title === "약속 없음") {
+    const dayEvents = getEventsForDate(date);
+    if (dayEvents.length === 0) {
         alert("삭제할 약속이 없습니다.");
         return;
     }
     
-    setSelectedDeleteIds([]); // 초기화
+    setSelectedDeleteIds([]); 
     setViewMode('delete');
     setActiveMenuId(null);
   };
 
-  // 삭제 
+  // 삭제 선택 토글
   const toggleDeleteSelection = (date) => {
-    // 해당 날짜의 이벤트들을 찾음
     const targetEvents = allEvents.filter(event => {
       const eDate = new Date(event.start);
       eDate.setHours(0,0,0,0);
@@ -153,15 +178,11 @@ const Invited = () => {
     if (targetEvents.length === 0) return;
 
     const targetIds = targetEvents.map(e => e.id);
-    
-    // 이미 선택되어 있는지 확인 (하나라도 포함되면 해제, 아니면 전체 선택)
     const isSelected = targetIds.every(id => selectedDeleteIds.includes(id));
 
     if (isSelected) {
-      // 선택 해제
       setSelectedDeleteIds(prev => prev.filter(id => !targetIds.includes(id)));
     } else {
-      // 선택 추가
       setSelectedDeleteIds(prev => [...prev, ...targetIds]);
     }
   };
@@ -177,14 +198,12 @@ const Invited = () => {
     setSelectedDeleteIds([]);
   };
 
-  // 추가
   const saveNewEvent = (eventData) => {
     const newEvent = { ...eventData, id: Date.now() };
     setAllEvents([...allEvents, newEvent]); 
     setViewMode('list');
   };
 
-  // 수정
   const updateEvent = (updatedEvent) => {
     setAllEvents(allEvents.map(event => 
       event.id === updatedEvent.id ? updatedEvent : event
@@ -201,7 +220,6 @@ const Invited = () => {
     return <UpdateEvent event={selectedEvent} onSave={updateEvent} onCancel={() => setViewMode('list')} />;
   }
 
-  // 삭제 모드인지 확인
   const isDeleteMode = viewMode === 'delete';
 
   return (
@@ -218,9 +236,8 @@ const Invited = () => {
             </h2>
           </div>
         ) : (
-          // 일반 모드 헤더
           <>
-            <div className="invitedSidebarLogo"> <LogoIconWhite /> </div>
+            <div className="invitedLogo"> <LogoIconWhite /> </div>
             <h1>{partyName}</h1>
             <p>{partyName}에 초대되었어요</p>
             <p>약속 범위 안에서 나의 일정이예요</p>
@@ -232,10 +249,9 @@ const Invited = () => {
         <div className="date-selector-container">
           {dates.length > 0 ? (
             dates.map((date, index) => {
-              const eventTitle = getEventTitleForDate(date); 
-              const hasEvent = eventTitle !== "약속 없음"; 
-              const dateId = date.getTime();
-              const isMenuOpen = activeMenuId === dateId;
+              const dayEvents = getEventsForDate(date); 
+              const hasEvent = dayEvents.length > 0;
+              const joinedTitles = dayEvents.map(e => e.title).join(", "); // 핸들러 전달용
 
               // 삭제 모드일 때 선택 여부 확인
               const isSelectedForDelete = hasEvent && allEvents.some(e => {
@@ -261,6 +277,7 @@ const Invited = () => {
                     opacity: isDeleteMode && !hasEvent ? 0.5 : 1 
                   }}
                 >
+                  {/* 아이콘 버튼 영역 */}
                   {isDeleteMode ? (
                       hasEvent && (
                           <div className="edit-icon-pos">
@@ -268,36 +285,30 @@ const Invited = () => {
                           </div>
                       )
                   ) : (
+                      // 👇 [수정됨] 토글 함수에 이벤트 객체(e)와 날짜 전달
                       <button 
                         className="edit-icon-pos" 
-                        onClick={() => toggleMenu(dateId)}
+                        onClick={(e) => toggleMenu(e, date)}
                       >
                         <EditIcon />
                       </button>
                   )}
 
-                  {/* 팝업 메뉴 (일반 모드일 때만 표시) */}
-                  {isMenuOpen && !isDeleteMode && (
-                    <div className="popup-menu">
-                      <button className="popup-btn add" onClick={() => handleAddClick(date)}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14"/></svg>
-                        추가하기
-                      </button>
-                      
-                      <button className="popup-btn normal" onClick={() => handleEditClick(date, eventTitle)}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        수정하기
-                      </button>
-                      
-                      <button className="popup-btn normal" onClick={() => enterDeleteMode(date)}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        삭제하기
-                      </button>
-                    </div>
-                  )}
+                  {/* 🚨 기존 팝업 메뉴 위치는 삭제됨 (아래로 이동) */}
 
                   <div className="event-date">{date.getDate()}</div> 
-                  <div className="event-info"><span className="event-title">{eventTitle}</span></div>
+                  
+                  <div className="event-info">
+                    {hasEvent ? (
+                      dayEvents.map((evt, i) => (
+                        <span key={i} className="event-title">
+                          {evt.title}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="event-title">약속 없음</span>
+                    )}
+                  </div>
                 </div>
               );
             })
@@ -307,9 +318,36 @@ const Invited = () => {
         </div>
       </main>
 
+      {/* 👇 [추가됨] 독립된 팝업 메뉴 렌더링 (스크롤 영향 안 받음) */}
+      {activeMenuId && menuTargetDate && !isDeleteMode && (
+        <div 
+          className="popup-menu" 
+          style={{ 
+            position: 'fixed', // 화면 기준 고정
+            top: `${popupPos.top}px`, 
+            left: `${popupPos.left}px` 
+          }}
+          onClick={(e) => e.stopPropagation()} 
+        >
+          <button className="popup-btn add" onClick={() => handleAddClick(menuTargetDate)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14"/></svg>
+            추가하기
+          </button>
+          
+          <button className="popup-btn normal" onClick={() => handleEditClick(menuTargetDate, getEventTitleForDate(menuTargetDate))}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            수정하기
+          </button>
+          
+          <button className="popup-btn normal" onClick={() => enterDeleteMode(menuTargetDate)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            삭제하기
+          </button>
+        </div>
+      )}
+
       <footer>
         {isDeleteMode ? (
-            // [삭제 모드] 네/아니오 버튼
             <>
                 <button 
                     className="confirm-btn" 
@@ -330,7 +368,6 @@ const Invited = () => {
                 </button>
             </>
         ) : (
-            // [일반 모드] 확인/수정하기 버튼
             <>
                 <button className="confirm-btn">확인</button>
                 <button className="edit-btn">나의 일정 수정하기</button>
