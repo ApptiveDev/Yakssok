@@ -72,8 +72,8 @@ export default function SelectRange({
   };
 
   const getRangeDates = (start, end) => {
-    const s = new Date(start);
-    const e = new Date(end);
+    let s = new Date(start);
+    let e = new Date(end);
     if (s > e) [s, e] = [e, s];
 
     const list = [];
