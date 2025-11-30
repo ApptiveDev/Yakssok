@@ -1,88 +1,148 @@
-/* --- 전체 페이지 레이아웃 --- */
+/* --- 페이지 레이아웃 --- */
 .resultPage {
   display: flex;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
 }
 
 /* --- 메인 컨테이너 --- */
 .resultContainer {
   flex: 1;
-  background-color: #FAFFF2;
+  background-color: #fafff2;
   border-radius: 12px;
-  padding: 24px;
   display: flex;
   flex-direction: column;
 }
 
-/* --- 중앙 내용 --- */
-.resultContent {
-  flex: 1;
-  text-align: center;
-  padding-top: 60px;
+/* --- 약속 범위 --- */
+.rangeContainer {
+  display: flex;
+  flex-direction: column;
 }
 
-.resultTitle {
-  font-size: 22px;
-  font-weight: 600;
-  color: #333;
+.rangeText {
+  display: flex;
+  margin: 25px;
+  color: #85837b;
+  font-size: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.weekContainer {
+  width: 100%;
+  padding: 30px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.monthText {
+  display: flex;
+  font-size: 30px;
+  color: #292929;
+  width: 245px;
+  height: 45px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- 날짜 7개 --- */
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  column-gap: 30px;
+  flex: 1;
+}
+
+.dayCell {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: 105px;
+  padding: 13px 16px;
+  border-radius: 15px;
+}
+
+.dayText {
+  font-size: 15px;
+  color: #3e3e3e;
+}
+
+.dayText.sunday {
+  color: #eeb1b1;
+}
+
+.dayText.saturday {
+  color: #74abb4;
+}
+
+.dayCell.selected {
+  background-color: #bbcea0;
+}
+
+.dayCell.selected .dayText {
+  color: #ffffff;
+}
+
+/* --- 추천 날짜 --- */
+.resultContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.noticeText {
+  font-size: 35px;
+  color: #292929;
+  margin: 45px;
+  text-align: center;
+}
+
+/* --- 추천 날짜 목록 --- */
+.resultList {
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+  align-items: center;
+}
+
+.resultCard {
+  width: 600px;
+  padding: 10px 30px;
+  border-radius: 20px;
+  background: #E9EDE2;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+}
+
+.resultNum {
+  width: 25px;
+  height: 25px;
+  border-radius: 8px;
+  background: #292929;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: #FFFFFF;
 }
 
 .resultText {
-  margin-top: 6px;
-  font-size: 18px;
-  color: #444;
-  line-height: 1.6;
-}
-
-/* --- 결과 카드 리스트 --- */
-.resultList {
-  margin-top: 60px;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
   align-items: center;
+  gap: 60px;
+  
+  font-size: 30px;
+  color: #292929;
 }
 
-/* --- 기본 카드 스타일 --- */
-.resultCard {
-  width: 80%;
-  max-width: 480px;
-  padding: 20px 26px;
-  border-radius: 16px;
-  background: #e5e7db;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  transition: 0.25s ease;
-}
-
-/* --- 활성 카드 (1등 카드) --- */
-.resultCard.active {
-  background: #ffffff;
-  box-shadow: 0 0 14px rgba(0, 0, 0, 0.08);
-  transform: scale(1.02);
-}
-
-/* --- 숫자 박스 --- */
-.resultNum {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  background: #d5d6ce;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 600;
-  color: #333;
-}
-
-/* --- 날짜 / 시간 텍스트 --- */
-.resultDate,
-.resultTime {
-  font-size: 20px;
-  color: #333;
+.resultDate {
+  width: 150px;
   font-weight: 500;
 }

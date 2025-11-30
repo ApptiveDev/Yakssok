@@ -1,6 +1,4 @@
-import React from "react";
 import SidebarLeft from "../components/SidebarLeft";
-import SidebarRight from "../components/SidebarRight";
 import "./Result.css";
 
 const Result = () => {
@@ -84,6 +82,17 @@ const Result = () => {
       className: "color-point-3",
     },
   ];
+
+  const sampleDays = [
+    { day: 7, selectedDay: false, dayOfWeek: 0 },
+    { day: 8, selectedDay: true, dayOfWeek: 1 },
+    { day: 9, selectedDay: true, dayOfWeek: 2 },
+    { day: 10, selectedDay: true, dayOfWeek: 3 },
+    { day: 11, selectedDay: false, dayOfWeek: 4 },
+    { day: 12, selectedDay: false, dayOfWeek: 5 },
+    { day: 13, selectedDay: false, dayOfWeek: 6 },
+  ];
+
   const sampleResult = [
     { id: 1, start: "2025-12-08T14:00:00" },
     { id: 2, start: "2025-12-12T15:00:00" },
@@ -106,22 +115,51 @@ const Result = () => {
   return (
     <div className="resultPage">
       <SidebarLeft events={sampleEvents} />
-
       <div className="resultContainer">
-        <div className="resultContent">
-          <div className="resultText">
-            약속하기 좋은 시간대<br />약쏙이 골라봤어요.
-          </div>
+        {/* 약속 범위 */}
+        <div className="rangeContainer">
+          <div className="rangeText">약속 범위</div>
+          <div className="weekContainer">
+            <div className="monthText">12월</div>
 
+            {/* 날짜 그리드 */}
+            <div className="weekGrid">
+              {sampleDays.map((day) => (
+                <div
+                  key={day.date}
+                  className={`dayCell ${day.selectedDay ? "selected" : ""}`}
+                >
+                  <div
+                    className={`dayText
+                      ${day.dayOfWeek === 0 ? "sunday" : ""} 
+                      ${day.dayOfWeek === 6 ? "saturday" : ""}`}
+                  >
+                    {day.day}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 추천 날짜 */}
+        <div className="resultContent">
+          <div className="noticeText">
+            약속하기 좋은 시간대
+            <br />
+            약쏙이 골라봤어요.
+          </div>
           <div className="resultList">
             {sampleResult.map((item, index) => (
               <div
                 key={item.id}
-                className={`resultCard ${index === 0 ? "active" : ""}`}
+                className="resultCard"
               >
                 <div className="resultNum">{index + 1}</div>
-                <div className="resultDate">{formatDate(item.start)}</div>
-                <div className="resultTime">{formatTime(item.start)}</div>
+                <div className="resultText">
+                  <div className="resultDate">{formatDate(item.start)}</div>
+                  <div className="resultTime">{formatTime(item.start)}</div>
+                </div>
               </div>
             ))}
           </div>
