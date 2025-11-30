@@ -3,12 +3,24 @@ import './Login.css';
 import logoImage from "../assets/logo.png";
 import googleLogo from "../assets/googleLogo.png";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 
 const Login = () => {
     const navigate = useNavigate();
 
     const navigateToHome = () => {
     navigate("/home");
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/user/google/login`);
+            const data = await response.json();
+
+            window.location.href = data.auth_url;
+        } catch (error) {
+            console.error("구글 로그인 실패", error);
+        }
     };
 
     return (
