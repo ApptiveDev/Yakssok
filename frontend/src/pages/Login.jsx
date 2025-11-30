@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from "react"; 
 import './Login.css';
 import logoImage from "../assets/logo.png";
 import googleLogo from "../assets/googleLogo.png";
@@ -11,6 +12,13 @@ const Login = () => {
     const navigateToHome = () => {
     navigate("/home");
     };
+
+    useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        navigateToHome(); 
+        }
+    }, [navigate]);
 
     const handleGoogleLogin = async () => {
         try {
@@ -32,7 +40,7 @@ const Login = () => {
             <span className='text-bold'>약쏙</span>
             <span className='text'>으로 더 간편하게.</span>
             <br />
-            <button className='login-button' onClick={navigateToHome}>
+            <button className='login-button' onClick={handleGoogleLogin}>
                 <img src={googleLogo}
                     alt="GoogleLogo"
                     className="googleLogo"/>
