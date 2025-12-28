@@ -9,7 +9,7 @@ class Appointments(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
     creator_id = Column(Integer)
-    max_participants = Column(Integer, nullable=True)
+    max_participants = Column(Integer, nullable=False)
     status = Column(
         Enum('VOTING', 'CONFIRMED','CANCELED'),
         nullable=False

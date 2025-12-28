@@ -5,15 +5,16 @@ from datetime import date
 
 class AppointmentCreateRequest(BaseModel):
     name: str
-    candidate_dates: List[date]
-    max_participants: Optional[int] = None
+    start_date: date
+    end_date: date
+    max_participants: int
 
 
 class AppointmentResponse(BaseModel):
     id: int
     name: str
     creator_id: int
-    max_participants: Optional[int]
+    max_participants: int
     status: str
     invite_link: str
     candidate_dates: List[date]

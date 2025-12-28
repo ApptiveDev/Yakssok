@@ -1,7 +1,7 @@
 import secrets
 import string
 from typing import List
-from datetime import date
+from datetime import date, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -24,6 +24,10 @@ class AppointmentService:
     ) -> Appointments:
         # 약속 생성 및 후보 날짜 등록
 
+        # 날짜 범위 검증
+        if request.end_date < request.start_date:
+            raise ValueError("종료일은 시작일보다 이후여야 합니다")
+
         # 고유한 초대 코드 생성
         invite_code = AppointmentService.generate_invite_code()
 
@@ -41,15 +45,17 @@ class AppointmentService:
         )
 
         db.add(appointment)
-        await db.flush()  
+        await db.flush()
 
-        # 후보 날짜들 등록
-        for candidate_date in request.candidate_dates:
+        # 시작일부터 종료일까지 모든 날짜를 후보 날짜로 등록
+        current_date = request.start_date
+        while current_date <= request.end_date:
             appointment_date = AppointmentDates(
                 appointment_id=appointment.id,
-                candidate_date=candidate_date
+                candidate_date=current_date
             )
             db.add(appointment_date)
+            current_date += timedelta(days=1)
 
         # 생성자 참여자목록에 반영
         creator_participation = Participations(
