@@ -2,7 +2,7 @@ import secrets
 import string
 import json
 from typing import List
-from datetime import date, timedelta
+from datetime import timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -84,7 +84,7 @@ class AppointmentService:
                         available_slots,
                         ensure_ascii=False
                     )
-        except Exception as e:
+        except Exception:
             pass
 
         await db.commit()
@@ -170,7 +170,7 @@ class AppointmentService:
                         available_slots,
                         ensure_ascii=False
                     )
-        except Exception as e:
+        except Exception:
             pass
 
         await db.commit()

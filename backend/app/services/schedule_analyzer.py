@@ -4,7 +4,6 @@ from collections import defaultdict
 
 from app.models.user_model import User
 from app.services.google_calendar_service import GoogleCalendarService
-from app.schema.appointment_schema import OptimalTimeSlot
 
 
 class ScheduleAnalyzer:
@@ -75,7 +74,7 @@ class ScheduleAnalyzer:
                 "calculated_at": datetime.now().isoformat()
             }
 
-        except Exception as e:
+        except Exception:
             return None
 
     @staticmethod
@@ -233,10 +232,10 @@ class ScheduleAnalyzer:
         # 시간순 정렬
         sorted_times = sorted(time_slots.keys())
 
-        results = []
-        current_start = None
-        current_participants = None
-        prev_time = None
+        results: List[Dict[str, Any]] = []
+        current_start: Optional[str] = None
+        current_participants: Optional[Set[int]] = None
+        prev_time: Optional[time] = None
 
         for time_str in sorted_times:
             participants = time_slots[time_str]
@@ -248,6 +247,9 @@ class ScheduleAnalyzer:
                 current_participants = participants
                 prev_time = current_time
                 continue
+
+            assert prev_time is not None
+            assert current_participants is not None
 
             time_diff = ScheduleAnalyzer._time_diff_minutes(prev_time, current_time)
             if time_diff == ScheduleAnalyzer.GRID_INTERVAL_MINUTES and participants == current_participants:
@@ -265,6 +267,7 @@ class ScheduleAnalyzer:
 
         # 마지막 블록 처리
         if current_start is not None and prev_time is not None:
+            assert current_participants is not None
             end_time = ScheduleAnalyzer._add_minutes(prev_time, ScheduleAnalyzer.GRID_INTERVAL_MINUTES)
             ScheduleAnalyzer._add_block_if_valid(
                 results, date_str, current_start, end_time.strftime("%H:%M"),
