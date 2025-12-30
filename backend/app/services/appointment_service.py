@@ -1,5 +1,6 @@
 import secrets
 import string
+import json
 from typing import List
 from datetime import date, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +8,8 @@ from sqlalchemy.future import select
 
 from app.models.appointment_model import Appointments, AppointmentDates, Participations
 from app.schema.appointment_schema import AppointmentCreateRequest
+from app.services.schedule_analyzer import ScheduleAnalyzer
+from app.services.user_service import UserService
 
 
 class AppointmentService:
@@ -48,6 +51,7 @@ class AppointmentService:
         await db.flush()
 
         # 시작일부터 종료일까지 모든 날짜를 후보 날짜로 등록
+        candidate_dates = []
         current_date = request.start_date
         while current_date <= request.end_date:
             appointment_date = AppointmentDates(
@@ -55,6 +59,7 @@ class AppointmentService:
                 candidate_date=current_date
             )
             db.add(appointment_date)
+            candidate_dates.append(current_date)
             current_date += timedelta(days=1)
 
         # 생성자 참여자목록에 반영
@@ -64,6 +69,23 @@ class AppointmentService:
             status='ATTENDING'
         )
         db.add(creator_participation)
+
+        # 생성자의 가용 시간 계산
+        try:
+            user = await UserService.get_user_by_google_id(str(creator_id), db)
+            if user and user.google_refresh_token:
+                available_slots = await ScheduleAnalyzer.calculate_available_slots(
+                    user=user,
+                    candidate_dates=candidate_dates
+                )
+
+                if available_slots:
+                    creator_participation.available_slots = json.dumps(
+                        available_slots,
+                        ensure_ascii=False
+                    )
+        except Exception as e:
+            pass
 
         await db.commit()
         await db.refresh(appointment)
@@ -95,7 +117,7 @@ class AppointmentService:
         return result.scalars().all()
 
     @staticmethod
-    async def join_appointment(invite_code: str, user_id: int, db: AsyncSession) -> Participations:
+    async def join_appointment(invite_code: str, user_id: str, db: AsyncSession) -> Participations:
         # 초대 코드로 약속 참여
 
         # 약속 조회
@@ -129,13 +151,35 @@ class AppointmentService:
             status='ATTENDING'
         )
         db.add(participation)
+
+        # 가용 시간 계산
+        try:
+            user = await UserService.get_user_by_google_id(str(user_id), db)
+            if user and user.google_refresh_token:
+                candidate_dates = await AppointmentService.get_appointment_dates(
+                    appointment.id, db
+                )
+
+                available_slots = await ScheduleAnalyzer.calculate_available_slots(
+                    user=user,
+                    candidate_dates=[ad.candidate_date for ad in candidate_dates]
+                )
+
+                if available_slots:
+                    participation.available_slots = json.dumps(
+                        available_slots,
+                        ensure_ascii=False
+                    )
+        except Exception as e:
+            pass
+
         await db.commit()
         await db.refresh(participation)
 
         return participation
 
     @staticmethod
-    async def _get_participation(user_id: int, appointment_id: int, db: AsyncSession) -> Participations:
+    async def _get_participation(user_id: str, appointment_id: int, db: AsyncSession) -> Participations:
         # 특정 사용자의 참여 정보 조회
         result = await db.execute(
             select(Participations).where(
@@ -155,3 +199,132 @@ class AppointmentService:
             )
         )
         return result.scalar()
+
+    @staticmethod
+    async def delete_appointment(invite_code: str, user_id: str, db: AsyncSession) -> bool:
+        # 약속 삭제
+        appointment = await AppointmentService.get_appointment_by_invite_code(invite_code, db)
+        if not appointment:
+            raise ValueError("존재하지 않는 약속입니다")
+
+        # 생성자 확인
+        if appointment.creator_id != user_id:
+            raise ValueError("약속 생성자만 삭제할 수 있습니다")
+
+        # 약속 삭제
+        await db.delete(appointment)
+        await db.commit()
+
+        return True
+
+    @staticmethod
+    async def get_appointment_detail_with_availability(
+        invite_code: str,
+        db: AsyncSession
+    ) -> dict:
+        # 약속 조회
+        appointment = await AppointmentService.get_appointment_by_invite_code(invite_code, db)
+        if not appointment:
+            raise ValueError("존재하지 않는 약속입니다")
+
+        # 후보 날짜 조회
+        candidate_dates = await AppointmentService.get_appointment_dates(appointment.id, db)
+        candidate_dates_list = sorted([ad.candidate_date for ad in candidate_dates])
+
+        # 모든 참여자 조회
+        result = await db.execute(
+            select(Participations)
+            .where(Participations.appointment_id == appointment.id)
+        )
+        all_participations = result.scalars().all()
+        total_participants = len(all_participations)
+
+        # 가용시간 데이터가 있는 참여자 수
+        participants_with_data = sum(1 for p in all_participations if p.available_slots)
+
+        # 각 날짜별 가용성 계산
+        date_availabilities = []
+        for candidate_date in candidate_dates_list:
+            available_count = 0
+
+            # 각 참여자의 available_slots를 확인
+            for participation in all_participations:
+                if not participation.available_slots:
+                    continue
+
+                try:
+                    slots_data = json.loads(participation.available_slots)
+                    slots = slots_data.get('slots', [])
+
+                    # 해당 날짜에 가용 시간이 있는지 확인
+                    for slot in slots:
+                        if slot['date'] == candidate_date.isoformat():
+                            # available_times가 비어있지 않으면 가용
+                            if slot.get('available_times'):
+                                available_count += 1
+                            break
+                except Exception:
+                    pass
+
+            # availability 상태 결정
+            if available_count == 0:
+                availability = "none"
+            elif available_count == total_participants:
+                availability = "all"
+            else:
+                availability = "partial"
+
+            date_availabilities.append({
+                "date": candidate_date,
+                "availability": availability,
+                "available_count": available_count,
+                "total_count": total_participants
+            })
+
+        return {
+            "id": appointment.id,
+            "name": appointment.name,
+            "creator_id": appointment.creator_id,
+            "max_participants": appointment.max_participants,
+            "status": appointment.status,
+            "invite_link": appointment.invite_link,
+            "total_participants": total_participants,
+            "participants_with_data": participants_with_data,
+            "dates": date_availabilities
+        }
+
+    @staticmethod
+    async def calculate_optimal_times(
+        appointment_id: int,
+        min_duration_minutes: int,
+        db: AsyncSession
+    ) -> List[dict]:
+        result = await db.execute(
+            select(Participations)
+            .where(Participations.appointment_id == appointment_id)
+            .where(Participations.available_slots.isnot(None))
+        )
+        participations = result.scalars().all()
+
+        if not participations:
+            return []
+
+        # JSON 파싱
+        all_slots = []
+        for p in participations:
+            try:
+                slots_data = json.loads(p.available_slots)
+                all_slots.append({
+                    'user_id': p.user_id,
+                    'slots': slots_data['slots']
+                })
+            except Exception as e:
+                pass
+
+        # 교집합 계산
+        optimal_times = ScheduleAnalyzer.find_common_slots(
+            all_slots,
+            min_duration_minutes
+        )
+
+        return optimal_times

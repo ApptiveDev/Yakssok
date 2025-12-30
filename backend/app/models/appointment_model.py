@@ -8,7 +8,7 @@ class Appointments(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
-    creator_id = Column(Integer)
+    creator_id = Column(String(255))
     max_participants = Column(Integer, nullable=False)
     status = Column(
         Enum('VOTING', 'CONFIRMED','CANCELED'),
@@ -17,8 +17,8 @@ class Appointments(Base):
     invite_link = Column(String(255),unique=True)
     created_at = Column(DateTime, default=datetime.now)
 
-    appointment_dates = relationship("AppointmentDates", back_populates="appointment")
-    participations = relationship("Participations", back_populates="appointment")
+    appointment_dates = relationship("AppointmentDates", back_populates="appointment", cascade="all, delete-orphan")
+    participations = relationship("Participations", back_populates="appointment", cascade="all, delete-orphan")
 
 
 class AppointmentDates(Base):
@@ -36,8 +36,8 @@ class Participations(Base):
     __tablename__ = "participations"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, nullable=False)
-    appointment_id = Column(Integer, ForeignKey('appointments.id'), nullable=False)
+    user_id = Column(String(255), nullable=False)
+    appointment_id = Column(Integer, ForeignKey('appointments.id', ondelete='CASCADE'), nullable=False)
     status = Column(
         Enum('ATTENDING', 'NOT_ATTENDING', 'MAYBE'),
         nullable=False,
