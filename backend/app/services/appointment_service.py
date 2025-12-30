@@ -318,7 +318,7 @@ class AppointmentService:
                     'user_id': p.user_id,
                     'slots': slots_data['slots']
                 })
-            except Exception as e:
+            except Exception:
                 pass
 
         # 교집합 계산
