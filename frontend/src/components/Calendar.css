@@ -248,6 +248,10 @@ button, .custom-header span, .fc-col-header-cell-cushion {
   color: #FFFFFF !important;
 }
 
+.past-event .event-title, .past-event .event-time-start { color: #C4C5B7 !important; }
+.today-event .event-title, .today-event .event-time-start { color: #FFFFFF !important; }
+.future-event .event-title, .future-event .event-time-start { color: #FFFFFF !important; }
+
 /* ---------------------------------------------------- /
 / 월간 캘린더 요일 스타일 /
 / ---------------------------------------------------- */
@@ -391,14 +395,13 @@ button, .custom-header span, .fc-col-header-cell-cushion {
 .fc-timegrid-event-harness {
   position: absolute;
   border-radius: 12px;
-  padding: 6px 8px;
-  background: #BBCEA0;
+  background: transparent !important; 
   color: white;
   box-sizing: border-box;
   z-index: 1;
-
   margin-left: 17px !important;
   margin-right: 17px !important;
+  border: none !important;
 }
 
 .fc-event-main {
@@ -476,7 +479,7 @@ button, .custom-header span, .fc-col-header-cell-cushion {
   font-size: 13px;
   line-height: 20px;
 
-  color: #FFFFFF;
+  color: inherit !important;
   margin-top: 5px;
 
   white-space: normal; 
@@ -492,7 +495,7 @@ button, .custom-header span, .fc-col-header-cell-cushion {
   font-size: 13px;
   line-height: 20px;
 
-  color: #FFFFFF;
+  color: inherit !important;
 }
 
 

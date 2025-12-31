@@ -92,7 +92,7 @@ const CreateEvent = ({ date, onSave, onCancel }) => {
           <label>약속 이름</label>
           <input 
             type="text" 
-            placeholder="ex) 듀듀듀"
+            placeholder="약속 이름을 입력하세요"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />

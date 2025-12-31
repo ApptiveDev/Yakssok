@@ -37,24 +37,24 @@ const Calendar = ({ events }) => {
   const handleTodayClick = () => {
     const api = calendarRef.current?.getApi();
     api?.today();
-    setCurrentDate(api.getDate());
+    if (api) setCurrentDate(api.getDate());
   };
 
   const handlePrevClick = () => {
     const api = calendarRef.current?.getApi();
     api?.prev();
-    setCurrentDate(api.getDate());
+    if (api) setCurrentDate(api.getDate());
   };
 
   const handleNextClick = () => {
     const api = calendarRef.current?.getApi();
     api?.next();
-    setCurrentDate(api.getDate());
+    if (api) setCurrentDate(api.getDate());
   };
 
   // 요일 헤더 커스텀
   const getDayHeaderContent = (info) => {
-    const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     const dayName = days[info.date.getDay()];
     const dayNumber = info.date.getDate();
 
@@ -71,13 +71,27 @@ const Calendar = ({ events }) => {
     return null;
   };
 
-  // 이벤트 렌더링 (주간)
+  // 주간 캘린더 이벤트 렌더링 (색상 조건 추가)
   const renderEventContent = (arg) => {
     const { event, timeText, view } = arg;
 
     if (view.type === 'timeGridWeek') {
+      const eventDate = new Date(event.start);
+      eventDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // CSS 클래스 결정 (CSS 파일에 정의된 클래스 사용)
+      let statusClass = "future-event";
+      if (eventDate.getTime() === today.getTime()) {
+        statusClass = "today-event";
+      } else if (eventDate.getTime() < today.getTime()) {
+        statusClass = "past-event";
+      }
+
       return (
-        <div className="custom-event-content">
+        <div className={`custom-event-content ${statusClass}`}>
           <div className="event-title">{event.title}</div>
           {timeText && (
             <div className="event-time-container">
@@ -88,7 +102,7 @@ const Calendar = ({ events }) => {
       );
     }
 
-    if (view.type === 'dayGridMonth') return null;
+    // 월간은 dayCellContent에서 처리하므로 여기선 null
     return null;
   };
 
@@ -132,25 +146,27 @@ const Calendar = ({ events }) => {
           locale="ko"
           events={events}
           headerToolbar={false}
-          datesSet={(info) => setActiveView(info.view.type)}
+          datesSet={(info) => {
+            setActiveView(info.view.type);
+            setCurrentDate(info.view.currentStart);
+          }}
           dayHeaderContent={getDayHeaderContent}
           eventContent={renderEventContent}
           eventDisplay="block"
-
           eventTimeFormat={{
             hour: '2-digit',
             minute: '2-digit',
             hour12: false,
           }}
-
           allDaySlot={false}
           slotLabelContent={(arg) => `${arg.date.getHours()}시`}
           slotMinTime="00:00:00"
           slotMaxTime="24:00:00"
           slotDuration="01:00:00"
           height="100%"
+          handleWindowResize={true}
 
-          // 월간 날짜 셀 커스텀 (오늘/과거/미래 색상 + 이벤트 박스)
+          // 월간 날짜 셀 커스텀
           dayCellContent={(arg) => {
             if (arg.view.type === 'dayGridMonth') {
               const cellDate = new Date(arg.date);
@@ -163,8 +179,6 @@ const Calendar = ({ events }) => {
                 return arg.dayNumberText.replace("일", "");
               }
 
-              // 하루의 모든 이벤트 가져오기
-              // 해당 날짜에 이벤트가 있는지 확인
               const dayEvents = events.filter(e => {
                 if (!e.start) return false;
                 const eDate = new Date(e.start);
@@ -173,20 +187,19 @@ const Calendar = ({ events }) => {
               });
 
               if (!dayEvents || dayEvents.length === 0) {
-                return arg.dayNumberText.replace("일", "");
+                return <div className="date-number">{arg.dayNumberText.replace("일", "")}</div>;
               }
 
-              // 하루 최대 2개 이벤트만 표시
               const displayEvents = dayEvents.slice(0, 2);
 
               let backgroundColor = "";
-              let textColor = "#1F1F1F"; 
+              let textColor = "#1F1F1F";
 
               if (cellDate.getTime() === today.getTime()) {
-                backgroundColor = "#F9CBAA"; 
+                backgroundColor = "#F9CBAA";
                 textColor = "#FFFFFF";
               } else if (cellDate.getTime() < today.getTime()) {
-                backgroundColor = "#EAEEE0"; 
+                backgroundColor = "#EAEEE0";
                 textColor = "#C4C5B7";
               } else {
                 backgroundColor = "#BBCEA0";
@@ -198,18 +211,17 @@ const Calendar = ({ events }) => {
                   className="calendar-day-box"
                   style={{ backgroundColor, color: textColor }}
                 >
-                  <div className="calendar-date-num">
+                  <div className="calendar-date-num" style={{ color: textColor }}>
                     {arg.dayNumberText.replace("일", "")}
                   </div>
                   {displayEvents.map((ev, i) => (
-                    <div key={i} className="calendar-event-title">
+                    <div key={i} className="calendar-event-title" style={{ color: textColor }}>
                       {ev.title}
                     </div>
-                ))}
+                  ))}
                 </div>
               );
             }
-
             return arg.dayNumberText;
           }}
         />

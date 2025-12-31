@@ -24,8 +24,8 @@ const Invited = () => {
   const partyName = "앱티브 팀플 회의"; 
 
   const partyDateRange = React.useMemo(() => ({
-    startDate: new Date(2025, 10, 2), 
-    endDate: new Date(2025, 11, 8),   
+    startDate: new Date(2025, 11, 1), 
+    endDate: new Date(2025, 12, 1),   
   }), []);
 
   const [dates, setDates] = useState([]); 
