@@ -40,7 +40,7 @@ button:focus {
   align-items: center;
 }
 
-.openButton {
+.sidebarButton {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -60,13 +60,13 @@ button:focus {
   opacity: 0;
   pointer-events: none;
 }
-.sidebarLeftLogo:not(.open):hover .openButton {
+.sidebarLeftLogo:not(.open):hover .sidebarButton {
   opacity: 1;
   pointer-events: auto;
 }
 
 /* 열린 상태에서 버튼 보이는 위치 */
-.sidebarLeftLogo.open .openButton {
+.sidebarLeftLogo.open .sidebarButton {
   opacity: 1;
   pointer-events: auto;
 
@@ -152,10 +152,12 @@ button:focus {
 }
 
 .iconRow {
-  margin: 135px 0px 0px 0px;
+  margin: 0px 0px 108px 0px;
   gap: 52px;
   display: flex;
+  flex-grow: 1;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
 }
 

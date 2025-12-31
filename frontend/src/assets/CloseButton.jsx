@@ -1,5 +1,5 @@
 import * as React from "react";
-const OpenButton = (props) => (
+const CloseButton = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={25}
@@ -13,8 +13,8 @@ const OpenButton = (props) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={4}
-      d="m26 34 10-10-10-10M12 34l10-10-10-10"
+      d="M22 34 12 24l10-10m14 20L26 24l10-10"
     />
   </svg>
 )
-export default OpenButton
+export default CloseButton

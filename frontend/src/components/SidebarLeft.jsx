@@ -3,13 +3,12 @@ import { useNavigate } from "react-router-dom";
 import "./SidebarLeft.css";
 import LogoIcon from "../assets/LogoIcon";
 import OpenButton from "../assets/OpenButton";
+import CloseButton from "../assets/CloseButton";
 import NewButton from "../assets/NewButton";
 import NewButtonClosed from "../assets/NewButtonClosed";
 import CalendarIcon from "../assets/CalendarIcon";
-import MyCalendarIcon from "../assets/MyCalendarIcon";
 import ListIcon from "../assets/ListIcon";
 import CalendarIconSelected from "../assets/CalendarIconSelected";
-import MyCalendarIconSelected from "../assets/MyCalendarIconSelected";
 import ListIconSelected from "../assets/ListIconSelected";
 import ListDot from "../assets/listDot";
 import profileImage from "../assets/profile.jpg";
@@ -127,8 +126,8 @@ const SidebarLeft = ({ events = [] }) => {
           onMouseEnter={() => !isOpen && setIsLogoHovered(true)}
           onMouseLeave={() => setIsLogoHovered(false)}
         >
-          <button className="openButton" onClick={() => setIsOpen(!isOpen)}>
-            <OpenButton />
+          <button className="sidebarButton" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <CloseButton /> : <OpenButton />}
           </button>
           <LogoIcon className="logoIcon" />
         </div>
@@ -151,13 +150,6 @@ const SidebarLeft = ({ events = [] }) => {
           <button className="iconButton" onClick={() => navigate("/home")}>
             {location.pathname === "/home" ? <CalendarIconSelected /> : <CalendarIcon />}
             <span className="iconText">약속 달력</span>
-          </button>
-          <button
-            className="iconButton"
-            onClick={() => navigate("/mycalendar")}
-          >
-            {location.pathname === "/mycalendar" ? <MyCalendarIconSelected /> : <MyCalendarIcon />}
-            <span className="iconText">나의 달력</span>
           </button>
           <button className="iconButton" onClick={() => navigate("/list")}>
             {location.pathname === "/calendar" ? <ListIconSelected /> : <ListIcon /> }
