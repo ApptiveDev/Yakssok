@@ -15,6 +15,7 @@ function App() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/home" element={<Home />} />
         <Route path="/invited" element={<Invited />} />
+        <Route path="/invite/:code" element={<Invited />} />
         <Route path="/create" element={<Create />} />
         <Route path="/result" element={<Result />} />
 

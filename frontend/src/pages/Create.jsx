@@ -5,11 +5,12 @@ import SidebarLeft from '../components/SidebarLeft';
 import SelectRange from '../components/SelectRange'; 
 import LinkPopup from "../components/LinkPopup";
 import logoImage from "../assets/createLogo.png";
+import { FRONT_BASE_URL } from '../config/front';
 
 const Create = () => {
     const navigate = useNavigate();
 
-    const sampleEvents = []; 
+    const sampleEvents = []; //좌측 사이드바용 샘플 데이터
     const [title, setTitle] = useState(""); 
     const [number, setNumber] = useState(0);
     const [selectedDates, setSelectedDates] = useState(new Set());
@@ -23,8 +24,9 @@ const Create = () => {
     const handleSubmit = () => {
         if (!isFormValid) return;
 
-        const fakeLink = `http://yakssok111.com`;
-        setShareLink(fakeLink);
+        const inviteCode = `AAAAAA`; 
+        const inviteLink = `${FRONT_BASE_URL}/${inviteCode}`
+        setShareLink(inviteLink);
         setIsPopupOpen(true);
     };
 
