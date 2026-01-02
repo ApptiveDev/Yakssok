@@ -31,24 +31,18 @@ const Invited = () => {
   const [dates, setDates] = useState([]); 
   const [filteredEvents, setFilteredEvents] = useState([]); 
   
-  // 팝업 메뉴 상태
   const [activeMenuId, setActiveMenuId] = useState(null);
 
-  // 👇 [추가됨] 팝업 위치 및 타겟 날짜 저장
   const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
   const [menuTargetDate, setMenuTargetDate] = useState(null);
 
-  // 화면 모드: 'list', 'create', 'update', 'delete'
   const [viewMode, setViewMode] = useState('list');
 
-  // 추가, 수정을 위한 데이터
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  // 삭제를 위한 데이터
   const [selectedDeleteIds, setSelectedDeleteIds] = useState([]);
 
-  // 날짜 배열 생성
   useEffect(() => {
     const dateArray = [];
     let currentDate = new Date(partyDateRange.startDate);
@@ -59,7 +53,6 @@ const Invited = () => {
     setDates(dateArray); 
   }, [partyDateRange]); 
 
-  // 이벤트 필터링 (allEvents 기준)
   useEffect(() => {
     const filtered = allEvents.filter((event) => {
       if (!event.start) return false;
@@ -78,7 +71,6 @@ const Invited = () => {
     setFilteredEvents(filtered); 
   }, [allEvents, partyDateRange]); 
 
-  // 해당 날짜의 이벤트 배열 반환
   const getEventsForDate = (date) => {
     const targetDate = new Date(date);
     targetDate.setHours(0, 0, 0, 0);
@@ -90,7 +82,6 @@ const Invited = () => {
     });
   };
   
-  // 날짜별 이벤트 제목 문자열 반환 (수정/삭제 등에서 사용)
   const getEventTitleForDate = (date) => {
     const dayEvents = getEventsForDate(date);
     return dayEvents.length > 0 
@@ -98,7 +89,6 @@ const Invited = () => {
       : "약속 없음";
   };
 
-  // 👇 [수정됨] 메뉴 토글 함수 (위치 계산 포함)
   const toggleMenu = (e, date) => {
     e.stopPropagation(); 
 
@@ -106,35 +96,29 @@ const Invited = () => {
 
     const dateMs = date.getTime();
 
-    // 이미 열려있는 메뉴를 다시 누르면 닫기
     if (activeMenuId === dateMs) {
       setActiveMenuId(null);
       return;
     }
 
-    // 클릭한 버튼의 위치 계산
     const eventBox = e.currentTarget.closest('.event-box');
     const rect = e.currentTarget.getBoundingClientRect();
     setPopupPos({
-      top: rect.top -155, // 버튼 바로 아래
-      left: rect.left + 50 // 버튼 오른쪽 끝에 맞춰서 왼쪽으로 정렬 (팝업 너비 고려)
+      top: rect.top -155, 
+      left: rect.left + 50 
     });
 
     setMenuTargetDate(date);
     setActiveMenuId(dateMs);
   };
 
-  // 추가
   const handleAddClick = (date) => {
     setSelectedDate(date);
     setViewMode('create'); 
     setActiveMenuId(null);
   };
 
-  // 수정
   const handleEditClick = (date, eventTitleString) => {
-    // 문자열에 포함된 제목을 가진 이벤트를 찾음 (간단한 로직)
-    // 실제로는 ID나 정확한 매칭을 사용하는 것이 더 안전함
     const targetEvent = allEvents.find(event => {
       const eDate = new Date(event.start);
       eDate.setHours(0,0,0,0);
@@ -152,7 +136,6 @@ const Invited = () => {
     }
   };
 
-  // 삭제 모드 진입
   const enterDeleteMode = (date) => {
     const dayEvents = getEventsForDate(date);
     if (dayEvents.length === 0) {
@@ -165,7 +148,6 @@ const Invited = () => {
     setActiveMenuId(null);
   };
 
-  // 삭제 선택 토글
   const toggleDeleteSelection = (date) => {
     const targetEvents = allEvents.filter(event => {
       const eDate = new Date(event.start);
@@ -251,9 +233,8 @@ const Invited = () => {
             dates.map((date, index) => {
               const dayEvents = getEventsForDate(date); 
               const hasEvent = dayEvents.length > 0;
-              const joinedTitles = dayEvents.map(e => e.title).join(", "); // 핸들러 전달용
+              const joinedTitles = dayEvents.map(e => e.title).join(", "); 
 
-              // 삭제 모드일 때 선택 여부 확인
               const isSelectedForDelete = hasEvent && allEvents.some(e => {
                   const eDate = new Date(e.start);
                   eDate.setHours(0,0,0,0);
@@ -277,7 +258,6 @@ const Invited = () => {
                     opacity: isDeleteMode && !hasEvent ? 0.5 : 1 
                   }}
                 >
-                  {/* 아이콘 버튼 영역 */}
                   {isDeleteMode ? (
                       hasEvent && (
                           <div className="edit-icon-pos">
@@ -285,7 +265,6 @@ const Invited = () => {
                           </div>
                       )
                   ) : (
-                      // 👇 [수정됨] 토글 함수에 이벤트 객체(e)와 날짜 전달
                       <button 
                         className="edit-icon-pos" 
                         onClick={(e) => toggleMenu(e, date)}
@@ -293,8 +272,6 @@ const Invited = () => {
                         <EditIcon />
                       </button>
                   )}
-
-                  {/* 🚨 기존 팝업 메뉴 위치는 삭제됨 (아래로 이동) */}
 
                   <div className="event-date">{date.getDate()}</div> 
                   
@@ -318,12 +295,11 @@ const Invited = () => {
         </div>
       </main>
 
-      {/* 👇 [추가됨] 독립된 팝업 메뉴 렌더링 (스크롤 영향 안 받음) */}
       {activeMenuId && menuTargetDate && !isDeleteMode && (
         <div 
           className="popup-menu" 
           style={{ 
-            position: 'fixed', // 화면 기준 고정
+            position: 'fixed', 
             top: `${popupPos.top}px`, 
             left: `${popupPos.left}px` 
           }}
