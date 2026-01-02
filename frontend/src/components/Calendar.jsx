@@ -102,7 +102,6 @@ const Calendar = ({ events }) => {
       );
     }
 
-    // 월간은 dayCellContent에서 처리하므로 여기선 null
     return null;
   };
 
@@ -138,7 +137,6 @@ const Calendar = ({ events }) => {
           </div>
         </div>
 
-        {/* FullCalendar 본체 */}
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin]}
