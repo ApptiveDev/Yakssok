@@ -99,7 +99,7 @@ const Create = () => {
                             type="number"
                             className="number-box"
                             min="0"
-                            max="10"
+                            max="30"
                             value={number}
                             onChange={(e) => setNumber(e.target.value)}
                         />
