@@ -15,6 +15,7 @@ const formatKoreanDateInfo = (date) => {
   const weekday = weekdays[d.getDay()];
 
   let hours = d.getHours();
+  let minutes = d.getMinutes(); 
   const ampm = hours >= 12 ? "오후" : "오전";
   hours = hours % 12;
   if (hours === 0) hours = 12;
@@ -22,7 +23,7 @@ const formatKoreanDateInfo = (date) => {
   return {
     dateLabel: `${month}월 ${day}일`,
     weekday,
-    timeLabel: `${ampm} ${hours}시`,
+    timeLabel: minutes != 0 ? `${ampm} ${hours}시 ${minutes}분` : `${ampm} ${hours}시`,
   };
 };
 
