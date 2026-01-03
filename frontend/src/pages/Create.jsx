@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './Create.css';
 import SelectRange from '../components/SelectRange'; 
 import LinkPopup from "../components/LinkPopup";
@@ -6,12 +6,20 @@ import logoImage from "../assets/createLogo.png";
 import { FRONT_BASE_URL } from '../config/front';
 import { API_BASE_URL } from '../config/api';
 import { useNavigate } from "react-router-dom";
+import { LuMoveVertical } from "react-icons/lu";
 
 const Create = () => {
     const navigate = useNavigate();
 
+    const mainRef = useRef(null);
+    const titleRef = useRef(null);
+    const numberRef = useRef(null);
+    const rangeRef = useRef(null);
+    const submitRef = useRef(null);
+    const [isSubmitVisible, setIsSubmitVisible] = useState(false);
+
     const [title, setTitle] = useState(""); 
-    const [number, setNumber] = useState(0);
+    const [number, setNumber] = useState("0");
     const [selectedDates, setSelectedDates] = useState(new Set());
     const isFormValid = title.trim().length > 0 &&
                         Number(number) > 0 &&
@@ -20,6 +28,57 @@ const Create = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [shareLink, setShareLink] = useState("");
     const [inviteCode, setInviteCode] = useState("");
+
+    useEffect(() => {
+        if (!isFormValid) {
+            setIsSubmitVisible(false);
+            return;
+        }
+
+        if (!submitRef.current || !mainRef.current) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsSubmitVisible(entry.isIntersecting);
+            },
+            {
+                root: mainRef.current,
+                threshold: 0.6,
+            }
+        );
+
+        observer.observe(submitRef.current);
+
+        return () => observer.disconnect();
+    }, [isFormValid]);
+
+    const getNextTarget = () => {
+        if (title.trim().length === 0) return titleRef.current;
+        if (Number(number) <= 0) return numberRef.current;
+        if (selectedDates.size === 0) return rangeRef.current;
+        return submitRef.current;
+    };
+
+    const showFloating = (title.trim().length > 0 || Number(number) > 0 || selectedDates.size > 0) && !isSubmitVisible;
+
+    const scrollToTarget = () => {
+        const target = getNextTarget();
+        const container = mainRef.current;
+
+        if (!target) return;
+
+        if (container) {
+            const containerRect = container.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+
+            const top =
+            container.scrollTop + (targetRect.top - containerRect.top) - 70;
+
+            container.scrollTo({ top, behavior: "smooth" });
+        } else {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    };
 
     const handleSubmit = async () => {
         if (!isFormValid) return;
@@ -81,35 +140,42 @@ const Create = () => {
 
     return (
         <div className='create-container'>
-            <main className='main-content'>
-                <img src={logoImage} alt="logoImage" className='logoImage'/>
-                <br/>
+            <main ref={mainRef} className='main-content'>
                 <form>
-                    <p className='request-text'>새로운 약속의 이름을 알려주세요</p>
-                    <p className='input-index'>약속 이름</p>
-                    <input
-                        className="title-input"
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="새로운 약속 이름"
-                    />
-                    <p className='request-text'>약속에 몇명의 인원이<br/>참여하나요?</p>
-                    <div className='number-input'>
-                        <span className='num-index-1'>참여인원</span>
+                    <div ref={titleRef}>
+                        <img src={logoImage} alt="logoImage" className='logoImage'/>
+                        <br/>
+                        <p className='request-text'>새로운 약속의 이름을 알려주세요</p>
+                        <p className='input-index'>약속 이름</p>
                         <input
-                            type="number"
-                            className="number-box"
-                            min="0"
-                            max="30"
-                            value={number}
-                            onChange={(e) => setNumber(e.target.value)}
+                            className="title-input"
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="새로운 약속 이름"
                         />
-                        <span className='num-index-2'>명</span>
                     </div>
-                    <p className='request-text'>어느 기간 안에서<br/>약속을 정하면 좋을까요?</p>
-                    <SelectRange value={selectedDates} onChange={setSelectedDates} />
+                    <div ref={numberRef} className='number-input-container'>
+                        <p className='request-text'>약속에 몇명의 인원이<br/>참여하나요?</p>
+                        <div className='number-input'>
+                            <span className='num-index-1'>참여인원</span>
+                            <input
+                                type="number"
+                                className="number-box"
+                                min="0"
+                                max="30"
+                                value={number}
+                                onChange={(e) => setNumber(e.target.value)}
+                            />
+                            <span className='num-index-2'>명</span>
+                        </div>
+                    </div>
+                    <div ref={rangeRef}>
+                        <p className='request-text'>어느 기간 안에서<br/>약속을 정하면 좋을까요?</p>
+                        <SelectRange value={selectedDates} onChange={setSelectedDates} />
+                    </div>
                     <button
+                        ref={submitRef}
                         type="button"
                         className="submit-button"
                         disabled={!isFormValid}
@@ -124,6 +190,15 @@ const Create = () => {
                         onClose={() => setIsPopupOpen(false)}
                     />
                 </form>
+                {showFloating && (
+                    <button
+                        type="button"
+                        className="floating-next"
+                        onClick={scrollToTarget}
+                    >
+                        <LuMoveVertical />
+                    </button>
+                )}
             </main>
             
         </div>
