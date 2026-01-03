@@ -129,9 +129,6 @@ const Home = () => {
         onClose={() => setOpen(false)} 
         selectedPayload={selectedPayload}
       />
-      
-      {/*우측 사이드바 임시 버튼*/}
-      <button onClick={() => setOpen(true)}></button>
 
       {/* 파티원의 초대 페이지로 이동하는 임시 링크 */}
       <Link to="/Invited" state={{ events: sampleEvents }}>
