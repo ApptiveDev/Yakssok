@@ -55,6 +55,13 @@ const Create = () => {
             body: JSON.stringify(payload),
             });
 
+            if (res.status == 401 || res.status == 403) {
+                localStorage.removeItem("access_token");
+                alert("로그인 정보가 만료되었어요. 다시 로그인해주세요.");
+                navigate("/");
+                return;
+            }
+
             if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             console.error("API error:", res.status, err);
