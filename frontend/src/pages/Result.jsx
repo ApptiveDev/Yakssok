@@ -232,7 +232,7 @@ const Result = () => {
   }, [daysForGrid]);
 
   const monthText = useMemo(() => {
-    if (!daysForGrid.length) return "약속";
+    if (!daysForGrid.length) return "";
     const dt = new Date(daysForGrid[0].dateStr + "T00:00:00");
     return `${dt.getMonth() + 1}월`;
   }, [daysForGrid]);
@@ -320,9 +320,7 @@ const Result = () => {
             <div className="weekGrid">
               {loadingDetail}
 
-              {!loadingDetail && daysForGrid.length === 0 && (
-                <div>약속 범위가 없어요.</div>
-              )}
+              {!loadingDetail && daysForGrid.length === 0}
 
               {!loadingDetail &&
                 calendarCells.map((cell) => (
@@ -356,6 +354,7 @@ const Result = () => {
               <input
                 type="number"
                 min="1"
+                max="24"
                 step="1"
                 value={durationHours}
                 onChange={(e) => setDurationHours(e.target.value)}
@@ -376,7 +375,7 @@ const Result = () => {
               >
                 {hourOptions.map((h) => (
                   <option key={`s-${h}`} value={String(h)}>
-                    {String(h).padStart(2, "0")}시
+                    {String(h).padStart(2)}
                   </option>
                 ))}
               </select>
@@ -388,7 +387,7 @@ const Result = () => {
               >
                 {hourOptions.map((h) => (
                   <option key={`e-${h}`} value={String(h)}>
-                    {String(h).padStart(2, "0")}시
+                    {String(h).padStart(2)}
                   </option>
                 ))}
               </select>
