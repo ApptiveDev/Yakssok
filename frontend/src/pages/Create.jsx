@@ -28,13 +28,10 @@ const Create = () => {
         if (!isFormValid) return;
 
         const dates = [...selectedDates].sort();
-        const start_date = dates[0];
-        const end_date = dates[dates.length - 1];
 
         const payload = {
             name: title.trim(),
-            start_date: start_date,
-            end_date: end_date,
+            candidate_dates: dates, 
             max_participants: Number(number),
         };
 
