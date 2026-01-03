@@ -22,6 +22,7 @@ const Create = () => {
 
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [shareLink, setShareLink] = useState("");
+    const [inviteCode, setInviteCode] = useState("");
 
     const handleSubmit = async () => {
         if (!isFormValid) return;
@@ -73,6 +74,7 @@ const Create = () => {
             const inviteCode = data.invite_link;
             const inviteLink = `${FRONT_BASE_URL}/invite/${inviteCode}`;
 
+            setInviteCode(inviteCode); 
             setShareLink(inviteLink);
             setIsPopupOpen(true);
 
@@ -125,6 +127,7 @@ const Create = () => {
                     <LinkPopup
                         open={isPopupOpen}
                         link={shareLink}
+                        inviteCode = {inviteCode}
                         onClose={() => setIsPopupOpen(false)}
                     />
                 </form>
