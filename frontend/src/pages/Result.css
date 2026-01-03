@@ -3,14 +3,14 @@
   display: flex;
   width: 100vw;
   height: 100vh;
-  background-color: #F5F6EF;
+  background-color: #e9ede2;
   overflow: hidden;
 }
 
 /* --- 메인 컨테이너 --- */
 .resultContainer {
   flex: 1;
-  background-color: #F5F6EF;
+  background-color: #fafff2;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -34,8 +34,7 @@
 }
 
 .weekContainer {
-  width: 100%;
-  padding: 30px 0;
+  padding: 30px;
   border-top: 1px solid rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   display: flex;
@@ -57,7 +56,7 @@
 .weekGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  column-gap: 30px;
+  gap: 30px;
   flex: 1;
 }
 
@@ -112,12 +111,13 @@
   width: 50px;
   height: 60px;
   padding: 10px 20px;
-  margin: 20px;
+  margin: 10px;
   border: none;
   border-radius: 15px;
   font-size: 30px;
   font-weight: 500;
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* --- 추천 날짜 --- */
@@ -144,7 +144,7 @@
 }
 
 .resultCard {
-  width: 600px;
+  width: 900px;
   padding: 10px 30px;
   border-radius: 20px;
   background: #e9ede2;
