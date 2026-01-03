@@ -1,4 +1,3 @@
-
 import { useState, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./SidebarLeft.css";
@@ -13,7 +12,6 @@ import CalendarIconSelected from "../assets/CalendarIconSelected";
 import ListIconSelected from "../assets/ListIconSelected";
 import ListDot from "../assets/listDot";
 import profileImage from "../assets/profile.jpg";
-import NewButtonCreated from "../assets/NewButtonCreated";
 
 const SidebarLeft = ({ events = [] }) => {
   const navigate = useNavigate();
@@ -179,7 +177,9 @@ const SidebarLeft = ({ events = [] }) => {
             </div>
           ) : (
             <div className="buttonIconClosed">
-              {isCreatePage ? <NewButtonCreated /> : <NewButtonClosed />}
+              <div className={isCreatePage ? "newButtonRotated" : ""}>
+                <NewButtonClosed />
+              </div>            
             </div>
           )}
 

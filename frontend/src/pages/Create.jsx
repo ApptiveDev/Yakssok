@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './Create.css';
-import SidebarLeft from '../components/SidebarLeft';
 import SelectRange from '../components/SelectRange'; 
 import LinkPopup from "../components/LinkPopup";
 import logoImage from "../assets/createLogo.png";
@@ -10,8 +9,6 @@ import { useNavigate } from "react-router-dom";
 
 const Create = () => {
     const navigate = useNavigate();
-
-    const sampleEvents = []; //좌측 사이드바용 샘플 데이터
 
     const [title, setTitle] = useState(""); 
     const [number, setNumber] = useState(0);
@@ -84,7 +81,6 @@ const Create = () => {
 
     return (
         <div className='create-container'>
-            <SidebarLeft events={sampleEvents} />
             <main className='main-content'>
                 <img src={logoImage} alt="logoImage" className='logoImage'/>
                 <br/>

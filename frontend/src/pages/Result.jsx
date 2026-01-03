@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import SidebarLeft from "../components/SidebarLeft";
 import "./Result.css";
 import { API_BASE_URL } from "../config/api";
 
 const Result = () => {
   const { inviteCode } = useParams();
-
-  const sampleEvents = []; // 사이드바 임시 데이터
 
   const [durationHours, setDurationHours] = useState(""); // 약속 소요 시간(시간 단위)
 
@@ -309,7 +306,6 @@ const Result = () => {
 
   return (
     <div className="resultPage">
-      <SidebarLeft events={sampleEvents} />
       <div className="resultContainer">
         {/* 약속 범위 */}
         <div className="rangeContainer">
