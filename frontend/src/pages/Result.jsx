@@ -192,7 +192,7 @@ const Result = () => {
         dateStr,
         day: date.getDate(),
         dayOfWeek: date.getDay(),
-        selectedDay: d.availability !== "none",
+        selectedDay: true,
       };
     });
   }, [detail]);
