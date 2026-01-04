@@ -383,14 +383,12 @@ class AppointmentService:
                 candidate_dates = [ad.candidate_date for ad in candidate_dates_obj]
 
                 available_slots = await ScheduleAnalyzer.calculate_available_slots(
-                    user=user,
-                    candidate_dates=candidate_dates
+                    user=user, candidate_dates=candidate_dates
                 )
 
                 if available_slots:
                     participation.available_slots = json.dumps(
-                        available_slots,
-                        ensure_ascii=False
+                        available_slots, ensure_ascii=False
                     )
                     updated_count += 1
                 else:
