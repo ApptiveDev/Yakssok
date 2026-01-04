@@ -14,6 +14,7 @@ from app.schema.appointment_schema import (
     OptimalTimesResponse,
     AppointmentDetailResponse,
     AppointmentListResponse,
+    SyncMySchedulesResponse
 )
 from app.utils.jwt import get_current_user
 
@@ -215,5 +216,29 @@ async def get_optimal_times(
         appointment_name=appointment.name,
         total_participants=total_participants,
         optimal_times=optimal_times,
-        calculation_status=calculation_status,
+        calculation_status=calculation_status
     )
+
+
+@router.post("/sync-my-schedules", response_model=SyncMySchedulesResponse)
+async def sync_my_schedules(
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    # 내가 참여한 모든 약속의 일정 동기화
+    try:
+        result = await AppointmentService.sync_my_schedules(
+            user_id=current_user["sub"],
+            db=db
+        )
+
+        return SyncMySchedulesResponse(
+            total_appointments=result['total_appointments'],
+            updated_count=result['updated_count'],
+            failed_count=result['failed_count'],
+        )
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"일정 동기화 실패: {str(e)}")
