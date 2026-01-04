@@ -14,7 +14,7 @@ from app.schema.appointment_schema import (
     OptimalTimesResponse,
     AppointmentDetailResponse,
     AppointmentListResponse,
-    SyncMySchedulesResponse
+    SyncMySchedulesResponse,
 )
 from app.utils.jwt import get_current_user
 
@@ -228,8 +228,7 @@ async def sync_my_schedules(
     # 내가 참여한 모든 약속의 일정 동기화
     try:
         result = await AppointmentService.sync_my_schedules(
-            user_id=current_user["sub"],
-            db=db
+            user_id=current_user["sub"], db=db
         )
 
         return SyncMySchedulesResponse(

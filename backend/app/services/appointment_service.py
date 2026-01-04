@@ -359,7 +359,7 @@ class AppointmentService:
             select(Appointments)
             .join(Participations, Appointments.id == Participations.appointment_id)
             .where(Participations.user_id == user_id)
-            .where(Appointments.status == 'VOTING')
+            .where(Appointments.status == "VOTING")
         )
         appointments = result.scalars().all()
 
@@ -404,5 +404,5 @@ class AppointmentService:
         return {
             "total_appointments": len(appointments),
             "updated_count": updated_count,
-            "failed_count": failed_count
+            "failed_count": failed_count,
         }
