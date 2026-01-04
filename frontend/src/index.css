@@ -13,9 +13,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+/* body {
   zoom: 0.9;
-}
+} */
 
 a {
   font-weight: 500;
