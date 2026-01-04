@@ -47,7 +47,33 @@ const SidebarRight = ({ open, onClose, selectedPayload }) => {
   const selectedEvent = selectedEvents[activeIndex] ?? null;
 
   const startDate = selectedEvent?.start ? new Date(selectedEvent.start) : null;
+  const endDate = selectedEvent?.end ? new Date(selectedEvent.end) : null;
+  const isAllDay = selectedEvent?.extendedProps?.isAllDay;
   const info = startDate ? formatKoreanDateInfo(startDate) : null;
+
+  const buildDateArray = (startDate, endDate, isAllDay) => {
+    if (!startDate) return [];
+
+    const result = [];
+    const cur = new Date(startDate);
+    cur.setHours(0, 0, 0, 0);
+
+    let end = endDate ? new Date(endDate) : new Date(startDate);
+    end.setHours(0, 0, 0, 0);
+
+    if (isAllDay && endDate) {
+      end.setDate(end.getDate() - 1);
+    }
+
+    while (cur <= end) {
+      result.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    return result;
+  };
+
+  const startToEnd = buildDateArray(startDate, endDate, isAllDay);
 
   return (
     <div className="background" onClick={onClose}>
@@ -66,7 +92,7 @@ const SidebarRight = ({ open, onClose, selectedPayload }) => {
         <div className="content-area">
           {startDate ? (
             <>
-              <CalendarStatic date={startDate} />
+              <CalendarStatic dates={startToEnd} />
               <br />
               <ClockStatic time={startDate} />
             </>
