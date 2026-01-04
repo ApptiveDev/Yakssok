@@ -465,6 +465,8 @@ button, .custom-header span, .fc-col-header-cell-cushion {
 
   color: #FFFFFF;
   overflow: hidden;
+
+  cursor: pointer;
 }
 
 /* 날짜 숫자 */

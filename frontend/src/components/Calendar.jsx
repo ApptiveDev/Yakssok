@@ -231,6 +231,34 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
     return null;
   };
 
+  const openSidebarWithFirstEventOfDay = useCallback(
+    (cellDate) => {
+      const clicked = new Date(cellDate);
+      clicked.setHours(0, 0, 0, 0);
+
+      const dayEvents = (events || []).filter((e) => {
+        if (!e?.start) return false;
+        const d = new Date(e.start);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime() === clicked.getTime();
+      });
+
+      if (dayEvents.length === 0) return;
+
+      const first = dayEvents[0];
+
+      onEventSelect?.({
+        type: "event",
+        id: first.id,
+        title: first.title,
+        start: first.start,
+        end: first.end,
+        allDay: first.allDay,
+      });
+    },
+    [events, onEventSelect]
+  );
+
   return (
     <div className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-xl">
       <div className="calendar-container">
@@ -373,6 +401,18 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
                 <div
                   className="calendar-day-box"
                   style={{ backgroundColor, color: textColor }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openSidebarWithFirstEventOfDay(arg.date);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openSidebarWithFirstEventOfDay(arg.date);
+                    }
+                  }}
                 >
                   <div className="calendar-date-num" style={{ color: textColor }}>
                     {arg.dayNumberText.replace("일", "")}
@@ -392,36 +432,6 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
               );
             }
             return arg.dayNumberText;
-          }}
-
-          //우측 사이드바 관련 dateClick 처리 (월간)
-          dateClick={(info) => {
-            if (info.view.type !== "dayGridMonth") return;
-
-            const clicked = new Date(info.date);
-            clicked.setHours(0, 0, 0, 0);
-
-            const dayEvents = (events || []).filter((e) => {
-              if (!e?.start) return false;
-              const d = new Date(e.start);
-              d.setHours(0, 0, 0, 0);
-              return d.getTime() === clicked.getTime();
-            });
-
-            if (dayEvents.length === 0) return;
-
-            //첫 일정만 보내도록 임시 설정
-            const first = dayEvents[0];
-
-            // Home으로 전달
-            onEventSelect?.({
-              type: "event",
-              id: first.id,
-              title: first.title,
-              start: first.start,
-              end: first.end,
-              allDay: first.allDay,
-            });
           }}
         />
       </div>
