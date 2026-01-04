@@ -20,13 +20,18 @@ const Result = () => {
 
   const accessToken = localStorage.getItem("access_token");
 
+  const makeLocalDate = (dateStr) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  };
+
   const formatDate = (dateStr) => {
     const [y, m, d] = dateStr.split("-").map(Number);
     return `${m}월 ${d}일`;
   };
 
   function formatDay(dateStr) {
-    const date = new Date(dateStr + "T00:00:00");
+    const date = makeLocalDate(dateStr);
     const days = ["일", "월", "화", "수", "목", "금", "토"];
     return days[date.getDay()] + "요일";
   }
@@ -170,13 +175,13 @@ const Result = () => {
 
     return detail.dates.map((d) => {
       const dateStr = typeof d.date === "string" ? d.date : String(d.date);
-      const dt = new Date(dateStr + "T00:00:00");
+      const date = makeLocalDate(dateStr);
 
       return {
         key: dateStr,
         dateStr,
-        day: dt.getDate(),
-        dayOfWeek: dt.getDay(),
+        day: date.getDate(),
+        dayOfWeek: date.getDay(),
         selectedDay: d.availability !== "none",
       };
     });
@@ -192,13 +197,13 @@ const Result = () => {
     const firstDateStr = sorted[0].dateStr;
     const lastDateStr = sorted[sorted.length - 1].dateStr;
 
-    const firstDt = new Date(firstDateStr + "T00:00:00");
-    const lastDt = new Date(lastDateStr + "T00:00:00");
+    const firstdate = makeLocalDate(firstDateStr);
+    const lastdate = makeLocalDate(lastDateStr);
 
-    const start = new Date(firstDt);
+    const start = new Date(firstdate);
     start.setDate(start.getDate() - start.getDay());
 
-    const end = new Date(lastDt);
+    const end = new Date(lastdate);
     end.setDate(end.getDate() + (6 - end.getDay()));
 
     const rangeMap = new Map(sorted.map((d) => [d.dateStr, d.selectedDay]));
@@ -230,8 +235,8 @@ const Result = () => {
 
   const monthText = useMemo(() => {
     if (!daysForGrid.length) return "";
-    const dt = new Date(daysForGrid[0].dateStr + "T00:00:00");
-    return `${dt.getMonth() + 1}월`;
+    const date = makeLocalDate(daysForGrid[0].dateStr);
+    return `${date.getMonth() + 1}월`;
   }, [daysForGrid]);
 
   const optimalList = useMemo(() => optimal?.optimal_times || [], [optimal]);
