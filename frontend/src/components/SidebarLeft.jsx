@@ -30,7 +30,7 @@ const SidebarLeft = ({ events = [] }) => {
       return;
     }
 
-    // create 페이지 + 사이드바 열림 -> 아무 것도 안 함
+    // create 페이지 + 사이드바 열림 -> create 리로딩
     if (isCreatePage && isOpen) {
       navigate(0)
       return;
@@ -61,8 +61,9 @@ const SidebarLeft = ({ events = [] }) => {
         const date = toDateStr(e.start);
         return {
           id: e.id ?? idx + 1,
-          text: e.title ?? e.summary ?? "(제목 없음)",
+          text: e.name ?? "(이름 없음)",
           date,
+          invite_link: e.invite_link,
         };
       })
       .filter((app) => {
@@ -79,6 +80,15 @@ const SidebarLeft = ({ events = [] }) => {
         return a.date.localeCompare(b.date);
       });
   }, [events, currentYear, currentMonth, todayStr]);
+
+  const appointmentsList = useMemo(() => {
+    return events.map((e, idx) => ({
+      id: e.id ?? idx + 1,
+      text: e.name ?? "(이름 없음)",
+      date: toDateStr(e.start),
+      invite_link: e.invite_link,
+    }));
+  }, [events]);
 
   const appointmentDateSet = useMemo(() => {
     return new Set(appointments.map((a) => a.date));
@@ -191,7 +201,7 @@ const SidebarLeft = ({ events = [] }) => {
             {location.pathname === "/home" ? <CalendarIconSelected /> : <CalendarIcon />}
             <span className="iconText">약속 달력</span>
           </button>
-          <button className="iconButton" onClick={() => navigate("/list")}>
+          <button className="iconButton" /* onClick={() => navigate("/list")}*/>
             {location.pathname === "/list" ? <ListIconSelected /> : <ListIcon /> }
             <span className="iconText">약속 목록</span>
           </button>
@@ -235,9 +245,15 @@ const SidebarLeft = ({ events = [] }) => {
         <div className="appointments">
           <div className="appointmentsBox">
             <ul>
-              {appointments.map((app) => (
+              {appointmentsList.map((app) => (
                 <li key={app.id}
-                  className={`appointmentItem ${app.date < todayStr ? "past" : "future"}`}>
+                  className={`appointmentItem`}
+                  // className={`appointmentItem ${app.date < todayStr ? "past" : ""}`}
+                  onClick={() => {
+                    if (!app.invite_link) return;
+                    navigate(`/result/${app.invite_link}`);
+                  }}                  
+                  >
                   <ListDot />
                   <span className="appointmentText">{app.text}</span>
                 </li>

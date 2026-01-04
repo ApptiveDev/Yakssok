@@ -416,14 +416,12 @@ button:focus {
   padding: 5px 0;
   display: flex;
   align-items: center;
+  color: #8aa24b;
+
 }
 
 .appointmentItem.past {
   color: #c1c4ba;
-}
-
-.appointmentItem.future {
-  color: #8aa24b;
 }
 
 .appointmentText {
