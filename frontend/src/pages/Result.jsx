@@ -20,6 +20,16 @@ const Result = () => {
 
   const accessToken = localStorage.getItem("access_token");
 
+  // 날짜 정규화
+  const normalizeDateStr = (raw) => {
+    const onlyDate = String(raw).split("T")[0];
+
+    const [y, m, d] = onlyDate.split("-").map(Number);
+    const mm = String(m).padStart(2, "0");
+    const dd = String(d).padStart(2, "0");
+    return `${y}-${mm}-${dd}`;
+  };
+
   const makeLocalDate = (dateStr) => {
     const [y, m, d] = dateStr.split("-").map(Number);
     return new Date(y, m - 1, d);
@@ -174,7 +184,7 @@ const Result = () => {
     if (!detail?.dates) return [];
 
     return detail.dates.map((d) => {
-      const dateStr = typeof d.date === "string" ? d.date : String(d.date);
+      const dateStr = normalizeDateStr(d.date);
       const date = makeLocalDate(dateStr);
 
       return {
