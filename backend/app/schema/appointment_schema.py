@@ -6,8 +6,7 @@ import json
 
 class AppointmentCreateRequest(BaseModel):
     name: str
-    start_date: date
-    end_date: date
+    candidate_dates: List[date]
     max_participants: int
 
 
@@ -106,6 +105,12 @@ class AppointmentDetailResponse(BaseModel):
     total_participants: int
     participants_with_data: int
     dates: List[DateAvailability]
+
+
+class AppointmentListResponse(BaseModel):
+    id: int
+    name: str
+    invite_link: str
 
     class Config:
         from_attributes = True
