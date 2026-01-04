@@ -231,7 +231,8 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
     return null;
   };
 
-  const openSidebarWithFirstEventOfDay = useCallback(
+  //우측 사이드바 관련 클릭 처리 (월간)
+  const openSidebarWithEventsOfDay = useCallback(
     (cellDate) => {
       const clicked = new Date(cellDate);
       clicked.setHours(0, 0, 0, 0);
@@ -241,22 +242,25 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
         const d = new Date(e.start);
         d.setHours(0, 0, 0, 0);
         return d.getTime() === clicked.getTime();
-      });
+      })
+      .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
       if (dayEvents.length === 0) return;
 
-      const first = dayEvents[0];
-
       onEventSelect?.({
-        type: "event",
-        id: first.id,
-        title: first.title,
-        start: first.start,
-        end: first.end,
-        allDay: first.allDay,
-      });
-    },
-    [events, onEventSelect]
+      type: "events",
+      date: clicked,
+      events: dayEvents.map((ev) => ({
+        id: ev.id,
+        title: ev.title,
+        start: ev.start,
+        end: ev.end,
+        allDay: ev.allDay,
+        extendedProps: ev.extendedProps,
+      })),
+    });
+  },
+  [events, onEventSelect]
   );
 
   return (
@@ -341,11 +345,14 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
             const ev = clickInfo.event;
             onEventSelect?.({
               type: "event",
-              id: ev.id,
-              title: ev.title,
-              start: ev.start,
-              end: ev.end,
-              allDay: ev.allDay,
+              event: {
+                id: ev.id,
+                title: ev.title,
+                start: ev.start,
+                end: ev.end,
+                allDay: ev.allDay,
+                extendedProps: ev.extendedProps,
+              },
             });
           }}
 
@@ -404,14 +411,7 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    openSidebarWithFirstEventOfDay(arg.date);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      openSidebarWithFirstEventOfDay(arg.date);
-                    }
+                    openSidebarWithEventsOfDay(arg.date);
                   }}
                 >
                   <div className="calendar-date-num" style={{ color: textColor }}>
