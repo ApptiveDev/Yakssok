@@ -1,6 +1,7 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./SidebarLeft.css";
+
 import LogoIcon from "../assets/LogoIcon";
 import OpenButton from "../assets/OpenButton";
 import CloseButton from "../assets/CloseButton";
@@ -13,65 +14,77 @@ import ListIconSelected from "../assets/ListIconSelected";
 import ListDot from "../assets/listDot";
 import profileImage from "../assets/profile.jpg";
 
+/* 
+  좌측 사이드바
+  - 약속 생성 버튼
+  - 약속 달력, 리스트 표시
+
+*/
+
 const SidebarLeft = ({ events = [] }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const sidebarRef = useRef(null);
 
   // 사이드바 상태
   const [isOpen, setIsOpen] = useState(false);
+
+  // 페이지 상태
+  const isHomePage = location.pathname === "/home";
+  const isCreatePage = location.pathname === "/create";
+  const isListPage = location.pathname == -"/list";
+
+  // 로고 상태
   const [isLogoHovered, setIsLogoHovered] = useState(false);
 
-  const isCreatePage = location.pathname === "/create";
+  // 약속 생성 버튼 클릭 로직
   const handleNewButtonClick = () => {
-    // create 페이지 + 사이드바 닫힘 -> home
     if (isCreatePage && !isOpen) {
       navigate("/home");
       return;
     }
 
-    // create 페이지 + 사이드바 열림 -> create 리로딩
     if (isCreatePage && isOpen) {
-      navigate(0)
+      navigate(0); // create 페이지 새로고침
       return;
     }
 
-    // 그 외 → create
     navigate("/create");
   };
 
-  // 달력 및 약속 상태
+  // 날짜 상태
   const today = new Date();
+  const todayStr = today.toLocaleDateString("sv-SE");
+
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
+  // 날짜 문자열 변환
   const toDateStr = (start) => {
     if (!start) return "";
-    const s =
-      typeof start === "string"
-        ? start
-        : start?.dateTime ?? start?.date ?? "";
-    return s ? String(s).slice(0, 10) : "";
+    const raw =
+      typeof start === "string" ? start : start?.dateTime ?? start?.date ?? "";
+    return raw ? String(raw).slice(0, 10) : "";
   };
 
-  const todayStr = new Date().toLocaleDateString("sv-SE");
-  const appointments = useMemo(() => {
-    return events
-      .map((e, idx) => {
-        const date = toDateStr(e.start);
-        return {
-          id: e.id ?? idx + 1,
-          text: e.name ?? "(이름 없음)",
-          date,
-          invite_link: e.invite_link,
-        };
-      })
-      .filter((app) => {
-        if (!app.date) return false;
-        const appDate = new Date(app.date);
+  // 약속 데이터 관리 (리스트, 달력)
+  const appointmentsList = useMemo(
+    () =>
+      events.map((e, idx) => ({
+        id: e.id ?? idx + 1,
+        text: e.name ?? "(이름 없음)",
+        date: toDateStr(e.start),
+        invite_link: e.invite_link,
+      })),
+    [events]
+  );
+
+  const appointmentsCalendar = useMemo(() => {
+    return appointmentsList
+      .filter((a) => {
+        if (!a.date) return false;
+        const date = new Date(a.date);
         return (
-          appDate.getFullYear() === currentYear &&
-          appDate.getMonth() === currentMonth
+          date.getFullYear() === currentYear && date.getMonth() === currentMonth
         );
       })
       .sort((a, b) => {
@@ -79,20 +92,12 @@ const SidebarLeft = ({ events = [] }) => {
         if (a.date >= todayStr && b.date < todayStr) return -1;
         return a.date.localeCompare(b.date);
       });
-  }, [events, currentYear, currentMonth, todayStr]);
+  }, [appointmentsList, currentYear, currentMonth, todayStr]);
 
-  const appointmentsList = useMemo(() => {
-    return events.map((e, idx) => ({
-      id: e.id ?? idx + 1,
-      text: e.name ?? "(이름 없음)",
-      date: toDateStr(e.start),
-      invite_link: e.invite_link,
-    }));
-  }, [events]);
-
-  const appointmentDateSet = useMemo(() => {
-    return new Set(appointments.map((a) => a.date));
-  }, [appointments]);
+  // 약속이 있는 날짜 set
+  const appointmentsDateSet = useMemo(() => {
+    return new Set(appointmentsCalendar.map((a) => a.date));
+  }, [appointmentsCalendar]);
 
   // 달력 렌더링
   const renderCalendar = () => {
@@ -100,31 +105,27 @@ const SidebarLeft = ({ events = [] }) => {
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    // 앞쪽 공백 채우기 (이전 달 자리)
+    // 앞쪽 빈 칸
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="empty"></div>);
+      days.push(<div key={`empty-${i}`} className="empty" />);
     }
 
-    // 날짜 채우기
+    // 날짜
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(
         2,
         "0"
       )}-${String(d).padStart(2, "0")}`;
-
-      // 약속이 있는 날짜인지 확인
-      const hasAppointment = appointmentDateSet.has(dateStr);
-
-      // 요일 구하기
+      const hasAppointment = appointmentsDateSet.has(dateStr);
       const dayOfWeek = new Date(currentYear, currentMonth, d).getDay();
-      let dayClass = "day";
-      if (dayOfWeek === 0) dayClass += " sunday";
-      else if (dayOfWeek === 6) dayClass += " saturday";
 
-      if (hasAppointment) dayClass += " hasAppointment";
+      let className = "day";
+      if (dayOfWeek === 0) className += " sunday";
+      if (dayOfWeek === 6) className += " saturday";
+      if (hasAppointment) className += " hasAppointment";
 
       days.push(
-        <div key={d} className={dayClass}>
+        <div key={d} className={className}>
           {d}
         </div>
       );
@@ -133,43 +134,35 @@ const SidebarLeft = ({ events = [] }) => {
     return days;
   };
 
-  // 달력 월 이동
-  const handlePrevMonth = () => {
-    if (currentMonth == 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
+  // 달력 이동 (월, 오늘)
+  const moveMonth = (direction) => {
+    setCurrentMonth((prev) => {
+      if (direction === -1 && prev === 0) {
+        setCurrentYear((y) => y - 1);
+        return 11;
+      }
+      if (direction === 1 && prev === 11) {
+        setCurrentYear((y) => y + 1);
+        return 0;
+      }
+      return prev + direction;
+    });
   };
 
-  const handleNextMonth = () => {
-    if (currentMonth == 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
-
-  // 달력 요일
-  const daysofWeek = ["일", "월", "화", "수", "목", "금", "토"];
-
-  // 오늘 날짜로 이동
   const handleGoToday = () => {
-    const today = new Date();
     setCurrentMonth(today.getMonth());
     setCurrentYear(today.getFullYear());
   };
 
+  const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
+
   return (
     <>
-      <div
-        ref={sidebarRef}
-        className={`sidebarLeft ${isOpen ? "open" : "closed"}`}
-      >
+      <div className={`sidebarLeft ${isOpen ? "open" : "closed"}`}>
+        {/* 로고 + 열고 닫는 버튼 */}
         <div
-          className={`sidebarLeftLogo ${isOpen ? "open" : ""} ${isLogoHovered ? "hovered" : ""}`}
+          className={`sidebarLeftLogo ${isOpen ? "open" : ""} 
+          ${isLogoHovered ? "hovered" : ""}`}
           onMouseEnter={() => !isOpen && setIsLogoHovered(true)}
           onMouseLeave={() => setIsLogoHovered(false)}
         >
@@ -189,51 +182,42 @@ const SidebarLeft = ({ events = [] }) => {
             <div className="buttonIconClosed">
               <div className={isCreatePage ? "newButtonRotated" : ""}>
                 <NewButtonClosed />
-              </div>            
+              </div>
             </div>
           )}
-
           {isOpen && <div className="buttonText">새로운 약속 만들기</div>}
         </button>
 
+        {/* 페이지 이동 버튼 (사이드바 닫힌 상태) */}
         <div className="iconRow">
           <button className="iconButton" onClick={() => navigate("/home")}>
-            {location.pathname === "/home" ? <CalendarIconSelected /> : <CalendarIcon />}
+            {isHomePage ? <CalendarIconSelected /> : <CalendarIcon />}
             <span className="iconText">약속 달력</span>
           </button>
           <button className="iconButton" /* onClick={() => navigate("/list")}*/>
-            {location.pathname === "/list" ? <ListIconSelected /> : <ListIcon /> }
+            {isListPage ? <ListIconSelected /> : <ListIcon />}
             <span className="iconText">약속 목록</span>
           </button>
         </div>
 
-        {/* 달력 */}
+        {/* 약속 달력 */}
         <div className="calendar">
           <div className="calendarHeader">
-            <button className="moveMonth" onClick={handlePrevMonth}>
-              {"<"}
-            </button>
+            <button className="moveMonth" onClick={() => moveMonth(-1)}>{"<"}</button>
             <span>{currentMonth + 1}월</span>
-            <button className="moveMonth" onClick={handleNextMonth}>
-              {">"}
-            </button>
-            <button className="todayButton" onClick={handleGoToday}>
-              오늘
-            </button>
+            <button className="moveMonth" onClick={() => moveMonth(1)}>{">"}</button>
+            <button className="todayButton" onClick={handleGoToday}>오늘</button>
           </div>
 
           {/* 요일 */}
           <div className="calendarGrid daysofWeek">
-            {daysofWeek.map((day, index) => {
-              let className = "dayName";
-              if (index === 0) className += " sunday";
-              else if (index === 6) className += " saturday";
-
-              return (
-                <div key={index} className={className}>
-                  {day}
-                </div>
-              );
+            {daysOfWeek.map((day, index) => {
+            <div
+              key={day}
+              className={`dayName ${index === 0 ? "sunday" : ""} ${index === 6 ? "saturday" : ""}`}
+            >
+              {day}
+            </div>
             })}
           </div>
 
@@ -245,17 +229,17 @@ const SidebarLeft = ({ events = [] }) => {
         <div className="appointments">
           <div className="appointmentsBox">
             <ul>
-              {appointmentsList.map((app) => (
-                <li key={app.id}
+              {appointmentsList.map((a) => (
+                <li
+                  key={a.id}
                   className={`appointmentItem`}
-                  // className={`appointmentItem ${app.date < todayStr ? "past" : ""}`}
-                  onClick={() => {
-                    if (!app.invite_link) return;
-                    navigate(`/result/${app.invite_link}`);
-                  }}                  
-                  >
+                  onClick={() =>
+                    a.invite_link &&
+                    navigate(`/result/${a.invite_link}`)
+                  }
+                >
                   <ListDot />
-                  <span className="appointmentText">{app.text}</span>
+                  <span className="appointmentText">{a.text}</span>
                 </li>
               ))}
             </ul>
