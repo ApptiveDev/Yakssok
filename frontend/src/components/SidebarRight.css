@@ -11,6 +11,7 @@
     display: flex;
     justify-content: flex-end;
     z-index: 1000;
+    zoom: 0.9;
 }
 
 .sidebar {
