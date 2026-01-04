@@ -148,7 +148,7 @@ export default function SelectRange({
 
   return (
     <div className="sr-container">
-      {/* <div className="sr-header">
+      <div className="sr-header">
         <button
           type="button"
           className="sr-nav"
@@ -174,7 +174,7 @@ export default function SelectRange({
         >
           ›
         </button>
-      </div> */}
+      </div>
 
       {/* <div className="sr-weekdays">
         {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
