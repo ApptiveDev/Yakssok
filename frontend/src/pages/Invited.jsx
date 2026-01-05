@@ -42,6 +42,20 @@ const Invited = () => {
 
   const [selectedDeleteIds, setSelectedDeleteIds] = useState([]);
 
+  // 로그인 상태 확인 및 리다이렉트
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+
+    if (!token) {
+      if (code) {
+        sessionStorage.setItem('invite-code', code);
+        navigate(`/login/${code}`, { replace: true });
+      } else {
+        navigate('/login', { replace: true });
+      }
+    }
+  }, [code, navigate]);
+
   // 초대 링크 기반 약속 정보 불러오기
   useEffect(() => {
     const fetchAppointment = async () => {
