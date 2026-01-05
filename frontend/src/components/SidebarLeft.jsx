@@ -12,7 +12,7 @@ import ListIcon from "../assets/ListIcon";
 import CalendarIconSelected from "../assets/CalendarIconSelected";
 import ListIconSelected from "../assets/ListIconSelected";
 import ListDot from "../assets/listDot";
-import profileImage from "../assets/profile.jpg";
+//import profileImage from "../assets/profile.jpg";
 
 /* 
   좌측 사이드바
@@ -21,17 +21,17 @@ import profileImage from "../assets/profile.jpg";
 
 */
 
-const SidebarLeft = ({ events = [] }) => {
+const SidebarLeft = ({ events = [], isOpen = false, onToggle }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   // 사이드바 상태
-  const [isOpen, setIsOpen] = useState(false);
+  //const [isOpen, setIsOpen] = useState(false);
 
   // 페이지 상태
   const isHomePage = location.pathname === "/home";
   const isCreatePage = location.pathname === "/create";
-  const isListPage = location.pathname == -"/list";
+  const isListPage = location.pathname === "/list";
 
   // 로고 상태
   const [isLogoHovered, setIsLogoHovered] = useState(false);
@@ -166,7 +166,7 @@ const SidebarLeft = ({ events = [] }) => {
           onMouseEnter={() => !isOpen && setIsLogoHovered(true)}
           onMouseLeave={() => setIsLogoHovered(false)}
         >
-          <button className="sidebarButton" onClick={() => setIsOpen(!isOpen)}>
+          <button className="sidebarButton" onClick={() => onToggle?.(!isOpen)}>
             {isOpen ? <CloseButton /> : <OpenButton />}
           </button>
           <LogoIcon className="logoIcon" />
@@ -248,7 +248,7 @@ const SidebarLeft = ({ events = [] }) => {
 
         {/* 프로필 */}
         <div className="profile">
-          <img src={profileImage} alt="profileImage" />
+          {/* <img src={profileImage} alt="profileImage" /> */}
         </div>
       </div>
     </>
