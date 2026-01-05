@@ -30,7 +30,7 @@ const SidebarLeft = ({ events = [] }) => {
   // 페이지 상태
   const isHomePage = location.pathname === "/home";
   const isCreatePage = location.pathname === "/create";
-  const isListPage = location.pathname == -"/list";
+  const isListPage = location.pathname === "/list";
 
   // 로고 상태
   const [isLogoHovered, setIsLogoHovered] = useState(false);
