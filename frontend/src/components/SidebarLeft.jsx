@@ -178,9 +178,7 @@ const SidebarLeft = ({ events = [] }) => {
               <NewButton />
             </div>
           ) : (
-            <div
-              className={`buttonIconClosed ${isCreatePage ? "Rotated" : ""}`}
-            >
+            <div className={`buttonIconClosed ${isCreatePage ? "Rotated" : ""}`}>
               <NewButtonClosed />
             </div>
           )}
