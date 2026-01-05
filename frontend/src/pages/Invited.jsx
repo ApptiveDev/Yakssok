@@ -600,7 +600,7 @@ const Invited = () => {
                           if (isDeleteMode && hasEvent) toggleDeleteSelection(candidate.date);
                         }}
                         style={{
-                          backgroundColor: hasEvent ? "#F9CBAA" : "#EAEEE0",
+                          backgroundColor: hasEvent ? "#F9CBAA" : "#E9E9E3",
                           color: hasEvent ? "#FFFFFF" : "#C4C5B7",
                           cursor: isDeleteMode && hasEvent ? 'pointer' : 'default',
                           opacity: isDeleteMode && !hasEvent ? 0.5 : 1
