@@ -53,7 +53,6 @@ class GoogleOAuthService:
 
             if not access_token:
                 raise HTTPException(status_code=400, detail="토큰을 받을 수 없습니다.")
-
             return {"access_token": access_token, "refresh_token": refresh_token}
         except requests.RequestException as e:
             raise HTTPException(

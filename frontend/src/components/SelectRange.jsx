@@ -47,6 +47,9 @@ function buildMonthMatrix(year, month) {
   return weeks;
 }
 
+const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const isPastDay = (day) => startOfDay(day) < startOfDay(new Date());
+
 export default function SelectRange({
   value,
   onChange,
@@ -91,6 +94,11 @@ export default function SelectRange({
   };
 
   const handlePointerDown = (day) => {
+    if (isPastDay(day)) {
+      alert("과거의 날짜는 선택할 수 없어요. "); 
+      return; 
+    }
+    
     setIsDragging(true);
     dragStartRef.current = day;
     setDragRange({ start: day, end: day });
@@ -115,6 +123,11 @@ export default function SelectRange({
 
     const next = new Set(selected);
     for (const d of rangeDates) {
+      if (isPastDay(d)) {
+        alert("과거의 날짜는 선택할 수 없어요. "); 
+        continue; 
+      }
+
       const iso = toISO(d);
       if (dragModeRef.current === "add") next.add(iso);
       else next.delete(iso);
@@ -148,7 +161,7 @@ export default function SelectRange({
 
   return (
     <div className="sr-container">
-      {/* <div className="sr-header">
+      <div className="sr-header">
         <button
           type="button"
           className="sr-nav"
@@ -174,7 +187,7 @@ export default function SelectRange({
         >
           ›
         </button>
-      </div> */}
+      </div>
 
       {/* <div className="sr-weekdays">
         {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
@@ -189,6 +202,7 @@ export default function SelectRange({
           const iso = toISO(day);
           const picked = selected.has(iso);
           const dragging = isInDragRange(day);
+          const past = isPastDay(day);
 
           return (
             <div
@@ -198,6 +212,7 @@ export default function SelectRange({
                 isCurrentMonth(day) ? "sr-current" : "sr-muted",
                 picked ? "sr-picked" : "",
                 dragging ? "sr-drag" : "",
+                past ? "sr-muted" : "",
               ].join(" ")}
               onPointerDown={() => handlePointerDown(day)}
               onPointerEnter={() => handlePointerEnter(day)}

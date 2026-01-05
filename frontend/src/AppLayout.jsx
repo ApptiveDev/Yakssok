@@ -1,41 +1,67 @@
-// 사이드바 고정 레이아웃 
-
 import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import SidebarLeft from "./components/SidebarLeft";
+import { API_BASE_URL } from "./config/api";
+
+/* 
+  좌측 사이드바 고정 레이아웃
+  - 각 페이지는 <Outlet />으로 렌더링
+
+*/
 
 export default function AppLayout() {
-  const [sidebarEvents] = useState([
-    { 
-      title: '팀 회의', 
-      start: '2025-12-31T17:00:00', 
-      end: '2025-12-31T18:00:00', 
-      className: 'yakssok-1' 
-    },
-    { 
-      title: '팀 회의', 
-      start: '2026-01-05T17:00:00', 
-      end: '2026-01-05T18:00:00', 
-      className: 'yakssok-2' 
-    },
-    { 
-      title: '카페', 
-      start: '2026-01-03T14:00:00', 
-      end: '2026-01-03T18:00:00', 
-      className: 'yakssok-3'
-    }, 
-    { 
-      title: '와플', 
-      start: '2026-02-05T18:00:00', 
-      end: '2026-02-06T11:00:00', 
-      className: 'yakssok-4'
-    }
-  ]);
+  // 약속 데이터 목록 상태
+  const [sidebarEvents, setSidebarEvents] = useState([]);
+
+  // 에러 메시지 상태
+  const [error, setError] = useState("");
+
+  // 로그인 토큰
+  const token = useMemo(() => localStorage.getItem("access_token"), []);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setError("");
+
+        const res = await fetch(`${API_BASE_URL}/appointments/`, {
+          method: "GET",
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        const mapped = data.map((a) => ({
+          id: a.id,
+          name: a.name,
+          invite_link: a.invite_link,
+          start: null, // 날짜 데이터 없음 (260105 ver.) 이후 받아야 함
+          className: `yakssok-${a.id}`,
+        }));
+
+        setSidebarEvents(mapped);
+      } catch (e) {
+        console.error(e);
+        setError("약속 목록을 불러오지 못함.");
+        setSidebarEvents([]);
+      }
+    };
+
+    fetchAppointments();
+  }, [token]);
 
   return (
     <div className="appLayout">
-      <SidebarLeft events={sidebarEvents} className="sidebar"/>
-      <Outlet className="content"/>
+      <SidebarLeft events={sidebarEvents} />
+      <Outlet className="content" />
     </div>
   );
 }

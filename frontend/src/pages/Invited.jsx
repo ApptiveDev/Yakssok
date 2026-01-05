@@ -560,6 +560,14 @@ const Invited = () => {
                     ) : (
                       <span className="event-title">약속 없음</span>
                     )}
+                    {/* <span className="availability-chip">
+                      {candidate.availableCount}/{candidate.totalCount} 참여
+                      {candidate.availability === "all"
+                        ? " - 모두 가능"
+                        : candidate.availability === "partial"
+                        ? " - 일부 가능"
+                        : " - 미응답"}
+                    </span> */}
                   </div>
                 </div>
               );

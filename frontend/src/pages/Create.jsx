@@ -150,6 +150,7 @@ const Create = () => {
                         <input
                             className="title-input"
                             type="text"
+                            maxLength={50}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="새로운 약속 이름"
