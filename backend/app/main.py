@@ -31,6 +31,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:

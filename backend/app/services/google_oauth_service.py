@@ -1,7 +1,6 @@
 import urllib.parse
 import requests
 from fastapi import HTTPException
-
 from app.variable import (
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
