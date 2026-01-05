@@ -42,19 +42,26 @@ const Invited = () => {
 
   const [selectedDeleteIds, setSelectedDeleteIds] = useState([]);
 
+  const redirectToLogin = useCallback(() => {
+    if (code) {
+      sessionStorage.setItem('invite-code', code);
+      sessionStorage.setItem('invite-redirect', `/invite/${code}`);
+      navigate(`/login/${code}`, { replace: true });
+    } else {
+      sessionStorage.removeItem('invite-code');
+      sessionStorage.setItem('invite-redirect', location.pathname + location.search);
+      navigate('/login', { replace: true });
+    }
+  }, [code, navigate, location.pathname, location.search]);
+
   // 로그인 상태 확인 및 리다이렉트
   useEffect(() => {
     const token = localStorage.getItem('access_token');
 
     if (!token) {
-      if (code) {
-        sessionStorage.setItem('invite-code', code);
-        navigate(`/login/${code}`, { replace: true });
-      } else {
-        navigate('/login', { replace: true });
-      }
+      redirectToLogin();
     }
-  }, [code, navigate]);
+  }, [code, navigate, redirectToLogin]);
 
   // 초대 링크 기반 약속 정보 불러오기
   useEffect(() => {
@@ -160,6 +167,12 @@ const Invited = () => {
           },
         });
 
+        if (response.status === 401) {
+          localStorage.removeItem('access_token');
+          redirectToLogin();
+          return;
+        }
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -179,7 +192,7 @@ const Invited = () => {
     } catch (error) {
       console.error('캘린더 불러오기 중 오류가 발생했습니다.', error);
     }
-  }, [candidateDates, normalizeEvents]);
+  }, [candidateDates, normalizeEvents, redirectToLogin]);
 
   useEffect(() => {
     fetchUserEvents();
@@ -690,7 +703,7 @@ const Invited = () => {
               </button>
               <button
                 className="edit-btn"
-                style={{ width: '100px', background: '#F4F8E9', color: '#555' }}
+                style={{ width: '100px', background: '#E9E9E3', color: '#555' }}
                 onClick={() => {
                   setViewMode('list');
                   setSelectedDeleteIds([]);
