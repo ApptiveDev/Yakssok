@@ -253,6 +253,37 @@ const Invited = () => {
     return data;
   };
 
+  const joinAppointment = async () => {
+    const token = localStorage.getItem('access_token');
+
+    if (!token) {
+      throw new Error('약속 참여를 위해 로그인 후 다시 시도해주세요.');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/appointments/join`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ invite_code: code }),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      const message = data?.detail || '약속 참여에 실패했습니다.';
+
+      if (response.status === 400 && message.includes('이미 참여한 약속입니다')) {
+        return null;
+      }
+
+      throw new Error(message);
+    }
+
+    return data;
+  };
+
   const toggleMenu = (e, date) => {
     e.stopPropagation(); 
 
@@ -454,6 +485,7 @@ const Invited = () => {
 
   const handleConfirm = async () => {
     try {
+      await joinAppointment(); // 약속 참여 처리
       await syncWithGoogleCalendar(); // 구글 캘린더 반영
       const syncResult = await syncMySchedules(); // 내가 참여한 약속 일정 동기화
 

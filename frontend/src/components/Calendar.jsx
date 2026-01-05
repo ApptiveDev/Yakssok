@@ -456,7 +456,7 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
                   backgroundColor = "#F9CBAA";
                   textColor = "#FFFFFF";
                 } else if (cellDate.getTime() < today.getTime()) {
-                  backgroundColor = "#EAEEE0";
+                  backgroundColor = "#E9E9E3";
                   textColor = "#C4C5B7";
                 } else {
                   backgroundColor = "#BBCEA0";
