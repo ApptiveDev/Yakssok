@@ -66,14 +66,14 @@
   display: flex;
   width: 100vw;
   height: 100vh;
-  background-color: #e9ede2;
+  background-color: #E9E9E3;
   overflow: hidden;
 }
 
 /* --- 메인 컨테이너 --- */
 .resultContainer {
   flex: 1;
-  background-color: #fafff2;
+  background-color: #FDFDF8;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -184,19 +184,30 @@
   text-align: center;
 }
 
-.errorText {
+.errorType {
   font-family: 'Pretendard';
   font-style: normal;
   font-weight: 500;
-  font-size: 20px;
-  line-height: 24px;
+  font-size: 25px;
+  line-height: 34px;
+  color: #85837b;
+  margin: 45px;
+  text-align: center;
+}
+
+.errorText {
+  font-family: 'Pretendard';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 22px;
   color: #85837b;
   margin: 45px;
   text-align: center;
 }
 
 .setInput {
-  background-color: #e9ede2;
+  background-color: #E9E9E3;
   color: #292929;
   width: 60px;
   height: 60px;
@@ -254,10 +265,10 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .resultCard {
-  width: 900px;
+  width: 700px;
   padding: 10px 30px;
   border-radius: 20px;
-  background: #e9ede2;
+  background: #E9E9E3;
   display: flex;
   flex-direction: row;
   justify-content: center;
