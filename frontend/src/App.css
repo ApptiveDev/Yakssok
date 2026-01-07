@@ -12,9 +12,3 @@ body, html, #root {
   height: 100vh;
   overflow: hidden;
 }
-
-.content {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-}
