@@ -9,6 +9,7 @@ import './Calendar.css';
 
 const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
   const calendarRef = useRef(null);
+  const calendarSurfaceRef = useRef(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [activeView, setActiveView] = useState('dayGridMonth');
   const [dateRange, setDateRange] = useState(null);
@@ -183,6 +184,44 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
       fetchCalendarEvents(dateRange);
     }
   }, [dateRange, fetchCalendarEvents]);
+
+  useEffect(() => {
+    const el = calendarSurfaceRef.current;
+    if (!el) return;
+
+    if (typeof ResizeObserver === 'undefined') {
+      const onResize = () => {
+        const api = calendarRef.current?.getApi?.();
+        api?.updateSize?.();
+      };
+      window.addEventListener('resize', onResize);
+      requestAnimationFrame(onResize);
+      return () => window.removeEventListener('resize', onResize);
+    }
+
+    let rafId = 0;
+
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const api = calendarRef.current?.getApi?.();
+        api?.updateSize?.();
+      });
+    });
+
+    ro.observe(el);
+
+    rafId = requestAnimationFrame(() => {
+      const api = calendarRef.current?.getApi?.();
+      api?.updateSize?.();
+    });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      ro.disconnect();
+    };
+  }, []);
+
 
   // 월/년도 표시 포맷팅
   const formatMonthAndYear = (date) => {
@@ -450,13 +489,8 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
             )}
           </div>
         )}
-
-        {/* {isLoading && <div className="calendar-loading">구글 캘린더를 불러오는 중이예요...</div>} */}
-        {/* {isLoading && (
-          <div className="calendar-loading">구글 캘린더를 불러오는 중이예요...</div>
-        )} */}
-
-        <div className={`calendar-surface ${bodyTransitionClass}`}>
+        
+        <div ref={calendarSurfaceRef} className={`calendar-surface ${bodyTransitionClass}`}>
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
