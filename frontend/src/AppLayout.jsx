@@ -62,7 +62,7 @@ export default function AppLayout() {
   return (
     <div className="appLayout">
       <SidebarLeft events={sidebarEvents} />
-      <Outlet className="content" />
+      <Outlet />
     </div>
   );
 }
