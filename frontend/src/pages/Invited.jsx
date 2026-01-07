@@ -686,7 +686,7 @@ const Invited = () => {
       pendingDeleteIds.length === 0 &&
       pendingUpdateEvents.length === 0
     ) {
-      alert('추가, 삭제하거나 수정한 일정은 없어요.');
+      alert('추가, 삭제하거나 수정한 일정은 없어요. 잠시만 기다려주세요.');
       return;
     }
 
