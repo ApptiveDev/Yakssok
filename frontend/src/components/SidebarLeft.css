@@ -213,7 +213,6 @@ button:focus {
   overflow: hidden;
 
   opacity: 1;
-  transition: max-height 0.35s ease, opacity 0.2s ease;
 
   white-space: nowrap;
   overflow: hidden;
@@ -242,7 +241,6 @@ button:focus {
   overflow: hidden;
 
   opacity: 1;
-  transition: max-height 0.35s ease, opacity 0.2s ease;
 }
 
 .iconButton {
@@ -280,7 +278,6 @@ button:focus {
   overflow: hidden;
 
   opacity: 1;
-  transition: max-height 0.35s ease, opacity 0.2s ease;
 }
 
 .calendarHeader {
@@ -383,7 +380,6 @@ button:focus {
   overflow: hidden;
 
   opacity: 1;
-  transition: max-height 0.35s ease, opacity 0.2s ease;
 }
 
 .appointmentsBox {
