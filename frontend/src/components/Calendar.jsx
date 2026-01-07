@@ -9,6 +9,7 @@ import './Calendar.css';
 
 const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
   const calendarRef = useRef(null);
+  const calendarSurfaceRef = useRef(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [activeView, setActiveView] = useState('dayGridMonth');
   const [dateRange, setDateRange] = useState(null);
@@ -183,6 +184,48 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
       fetchCalendarEvents(dateRange);
     }
   }, [dateRange, fetchCalendarEvents]);
+
+  useEffect(() => {
+    const el = calendarSurfaceRef.current;
+    if (!el) return;
+
+    // 구형 환경 대비: ResizeObserver가 없으면 window resize에만 의존
+    if (typeof ResizeObserver === 'undefined') {
+      const onResize = () => {
+        const api = calendarRef.current?.getApi?.();
+        api?.updateSize?.();
+      };
+      window.addEventListener('resize', onResize);
+      // 최초 1회
+      requestAnimationFrame(onResize);
+      return () => window.removeEventListener('resize', onResize);
+    }
+
+    let rafId = 0;
+
+    const ro = new ResizeObserver(() => {
+      // transition 중 연속 호출 방지: 마지막 프레임에 1번만 반영
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const api = calendarRef.current?.getApi?.();
+        api?.updateSize?.();
+      });
+    });
+
+    ro.observe(el);
+
+    // 최초 1회도 보정(초기 렌더 직후)
+    rafId = requestAnimationFrame(() => {
+      const api = calendarRef.current?.getApi?.();
+      api?.updateSize?.();
+    });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      ro.disconnect();
+    };
+  }, []);
+
 
   // 월/년도 표시 포맷팅
   const formatMonthAndYear = (date) => {
@@ -456,7 +499,7 @@ const Calendar = ({ events: initialEvents = [] , onEventSelect }) => {
           <div className="calendar-loading">구글 캘린더를 불러오는 중이예요...</div>
         )} */}
 
-        <div className={`calendar-surface ${bodyTransitionClass}`}>
+        <div ref={calendarSurfaceRef} className={`calendar-surface ${bodyTransitionClass}`}>
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
