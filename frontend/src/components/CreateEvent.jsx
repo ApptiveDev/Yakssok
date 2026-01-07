@@ -58,7 +58,7 @@ const CreateEvent = ({ date, onSave, onCancel }) => {
 
     // 종료 시간이 시작 시간보다 빠른 경우 방어 코드
     if (newEndDate < newStartDate) {
-      alert("종료 시간이 시작 시간보다 빠를 수 없습니다.");
+      alert("종료 시간이 시작 시간보다 빠를 수 없어요.");
       return;
     }
 
