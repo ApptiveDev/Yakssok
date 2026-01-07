@@ -25,6 +25,13 @@ const UpdateEvent = ({ event, eventsForDate = [], onSave, onCancel }) => {
   const [initialStartTime, setInitialStartTime] = useState('');
   const [initialEndTime, setInitialEndTime] = useState('');
 
+  const isAllDayEvent = (targetEvent) => {
+    if (!targetEvent) return false;
+    if (targetEvent.allDay || targetEvent?.extendedProps?.isAllDay) return true;
+    if (targetEvent.start?.date && !targetEvent.start?.dateTime) return true;
+    return typeof targetEvent.start === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(targetEvent.start);
+  };
+
   const formatTime = (dateObj) => {
     if (!dateObj) return '';
     const hh = String(dateObj.getHours()).padStart(2, '0');
@@ -33,32 +40,42 @@ const UpdateEvent = ({ event, eventsForDate = [], onSave, onCancel }) => {
   };
 
   useEffect(() => {
-  if (!event) return;
+    if (!event) return;
 
-  const sDate = new Date(event.start);
-  const sTime = formatTime(sDate);
+    const isAllDay = isAllDayEvent(event);
 
-  let eTime;
-  if (event.end) {
-    eTime = formatTime(new Date(event.end));
-  } else {
-    const eDate = new Date(sDate.getTime() + 60 * 60 * 1000);
-    eTime = formatTime(eDate);
-  }
+    let sTime = '';
+    let eTime = '';
 
-  setTitle(event.title);
-  setStartTime(sTime);
-  setEndTime(eTime);
+    setTitle(event.title);
 
-  setInitialTitle(event.title);
-  setInitialStartTime(sTime);
-  setInitialEndTime(eTime);
-}, [event]);
+    if (isAllDay) {
+      sTime = '00:00';
+      eTime = '24:00';
+    } else {
+      const sDate = new Date(event.start);
+      sTime = formatTime(sDate);
+
+      if (event.end) {
+        eTime = formatTime(new Date(event.end));
+      } else {
+        const eDate = new Date(sDate.getTime() + 60 * 60 * 1000);
+        eTime = formatTime(eDate);
+      }
+    }
+
+    setStartTime(sTime);
+    setEndTime(eTime);
+
+    setInitialTitle(event.title);
+    setInitialStartTime(sTime);
+    setInitialEndTime(eTime);
+  }, [event]);
 
   const hasAnyInput =
-  title.trim() !== initialTitle ||
-  startTime !== initialStartTime ||
-  endTime !== initialEndTime
+    title.trim() !== initialTitle ||
+    startTime !== initialStartTime ||
+    endTime !== initialEndTime
 
   const handleSave = () => {
     if (!hasAnyInput) {
@@ -74,9 +91,11 @@ const UpdateEvent = ({ event, eventsForDate = [], onSave, onCancel }) => {
       updatePayload.summary = trimmed;
     }
 
+    const hasTimeChange =
+      startTime !== initialStartTime || endTime !== initialEndTime;
     const hasBothTimes = Boolean(startTime && endTime);
 
-    if (startTime || endTime) {
+    if (hasTimeChange) {
       if (!hasBothTimes) {
         alert('시작 시간과 종료 시간을 모두 입력해주세요.');
         return;
