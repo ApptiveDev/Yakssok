@@ -797,7 +797,7 @@ const Invited = () => {
       alert('구글 캘린더와 동기화되었어요. 잠시만 기다려주세요.');
     } catch (error) {
       console.error(error);
-      alert(error.message || '캘린더 동기화 중 문제가 발생했습니다.');
+      alert(error.message || '캘린더 동기화 중 문제가 발생했어요.');
     }
   };
 
@@ -809,13 +809,13 @@ const Invited = () => {
       try {
         await joinAppointment(); // 약속 참여 처리
       } catch (e) {
-      alert(e?.message || "약속 참여 중 오류가 발생했어요.");
+      alert("이미 참여한 약속은 수정만 가능해요.");
       }
 
       try {
         await syncWithGoogleCalendar(); // 구글 캘린더 반영
       } catch (e) {
-        alert(e?.message || "구글 캘린더 동기화 중 오류가 발생했어요.");
+        alert("구글 캘린더 동기화 중 오류가 발생했어요.");
       }
       try {
         const syncResult = await syncMySchedules(); // 내가 참여한 약속 일정 동기화
@@ -826,12 +826,12 @@ const Invited = () => {
           );
         }
       } catch (e) {
-        alert(e?.message || "일정 재계산 중 오류가 발생했어요.");
+        alert("일정 재계산 중 오류가 발생했어요.");
       }
 
       navigate(`/result/${code}`);    // 결과 페이지로 이동
     } catch (e) {
-      alert(e?.message || "처리 중 오류가 발생했어요.");
+      alert("처리 중 오류가 발생했어요.");
     }
   };
 
