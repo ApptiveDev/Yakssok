@@ -809,7 +809,7 @@ const Invited = () => {
       try {
         await joinAppointment(); // 약속 참여 처리
       } catch (e) {
-      alert("이미 참여한 약속은 수정만 가능해요.");
+      alert("이미 참여한 약속이라 수정만 가능해요.");
       }
 
       try {
@@ -822,7 +822,7 @@ const Invited = () => {
 
         if (syncResult) {
           alert(
-            `총 ${syncResult.total_appointments}개의 약속 중 ${syncResult.updated_count}개를 동기화했어요.\n실패: ${syncResult.failed_count}개`
+            "결과가 계산되었어요."
           );
         }
       } catch (e) {
