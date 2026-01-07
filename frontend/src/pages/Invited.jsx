@@ -450,10 +450,6 @@ const Invited = () => {
     if (!response.ok) {
       const message = data?.detail || '약속 참여에 실패했습니다.';
 
-      if (response.status === 400 && message.includes('이미 참여한 약속입니다')) {
-        return null;
-      }
-
       throw new Error(message);
     }
 
@@ -623,6 +619,38 @@ const Invited = () => {
   const updateEvent = (updatedEvent, updatePayload = {}) => {
     const isNewlyAdded = pendingAddEvents.some((event) => event.id === updatedEvent.id);
 
+    const normalizedPayload = { ...updatePayload };
+
+    const isAllDay =
+      normalizedPayload.start?.date && !normalizedPayload.start?.dateTime;
+
+    if (isAllDay) {
+      const startDate = normalizedPayload.start.date;
+
+      const endDate =
+        normalizedPayload.end?.date ||
+        new Date(new Date(startDate).getTime() + 86400000)
+          .toISOString()
+          .slice(0, 10);
+
+      normalizedPayload.start = { date: startDate };
+      normalizedPayload.end = { date: endDate };
+    } else {
+      if (normalizedPayload.start?.dateTime) {
+        normalizedPayload.start = {
+          dateTime: normalizedPayload.start.dateTime,
+          timeZone: 'Asia/Seoul',
+        };
+      }
+
+      if (normalizedPayload.end?.dateTime) {
+        normalizedPayload.end = {
+          dateTime: normalizedPayload.end.dateTime,
+          timeZone: 'Asia/Seoul',
+        };
+      }
+    }
+
     if (isNewlyAdded) {
       setPendingAddEvents((prev) =>
         prev.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
@@ -639,7 +667,7 @@ const Invited = () => {
       const hasPayload = updatePayload && Object.keys(updatePayload).length > 0;
 
       return hasPayload
-        ? [...remaining, { id: updatedEvent.id, payload: updatePayload }]
+        ? [...remaining, { id: updatedEvent.id, payload: normalizedPayload }]
         : remaining;
     });
 
@@ -662,9 +690,33 @@ const Invited = () => {
       return;
     }
 
+    const handleCalendarError = async (response, fallbackMessage) => {
+      let data = null;
+      try {
+        data = await response.json();
+      } catch (error) {
+        data = null;
+      }
+
+      if (data?.reauthUrl) {
+        window.location.href = data.reauthUrl;
+        return true;
+      }
+
+      if (response.status === 401) {
+        localStorage.removeItem('access_token');
+        redirectToLogin();
+        return true;
+      }
+
+      const message = data?.detail || fallbackMessage;
+      throw new Error(message);
+    };
+
     try {
       for (const update of pendingUpdateEvents) {
-        const res = await fetch(`${API_BASE_URL}/calendar/events/${update.id}`, {
+        const encodedEventId = encodeURIComponent(update.id);
+        const res = await fetch(`${API_BASE_URL}/calendar/events/${encodedEventId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -673,50 +725,54 @@ const Invited = () => {
           body: JSON.stringify(update.payload),
         });
 
-        if (res.status === 401) {
-          localStorage.removeItem('access_token');
-          redirectToLogin();
-          return;
-        }
-
         if (!res.ok) {
-          const message = (await res.json())?.detail || '일정 수정에 실패했습니다.';
-          throw new Error(message);
+          const handled = await handleCalendarError(res, '일정 수정에 실패했습니다.');
+          if (handled) return;
         }
       }
 
       for (const deleteId of pendingDeleteIds) {
-        const res = await fetch(`${API_BASE_URL}/calendar/events/${deleteId}`, {
+        const encodedEventId = encodeURIComponent(deleteId);
+        const res = await fetch(`${API_BASE_URL}/calendar/events/${encodedEventId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (res.status === 401) {
-          localStorage.removeItem('access_token');
-          redirectToLogin();
-          return;
-        }
-
         if (!res.ok) {
-          const message = (await res.json())?.detail || '일정 삭제에 실패했습니다.';
-          throw new Error(message);
+          const handled = await handleCalendarError(res, '일정 삭제에 실패했습니다.');
+          if (handled) return;
         }
       }
 
       for (const event of pendingAddEvents) {
+        const isAllDay = event.allDay;
+
         const payload = {
           summary: event.title || event.summary || '제목 없음',
           description: event.description,
-          start: {
-            dateTime: new Date(event.start).toISOString(),
-            timeZone: 'Asia/Seoul',
-          },
-          end: {
-            dateTime: new Date(event.end || event.start).toISOString(),
-            timeZone: 'Asia/Seoul',
-          },
+          ...(isAllDay
+            ? {
+                start: { date: event.start },
+                end: {
+                  date:
+                    event.end ||
+                    new Date(new Date(event.start).getTime() + 86400000)
+                      .toISOString()
+                      .slice(0, 10),
+                },
+              }
+            : {
+                start: {
+                  dateTime: new Date(event.start).toISOString(),
+                  timeZone: 'Asia/Seoul',
+                },
+                end: {
+                  dateTime: new Date(event.end || event.start).toISOString(),
+                  timeZone: 'Asia/Seoul',
+                },
+              }),
         };
 
         const res = await fetch(`${API_BASE_URL}/calendar/events`, {
@@ -728,15 +784,9 @@ const Invited = () => {
           body: JSON.stringify(payload),
         });
 
-        if (res.status === 401) {
-          localStorage.removeItem('access_token');
-          redirectToLogin();
-          return;
-        }
-
         if (!res.ok) {
-          const message = (await res.json())?.detail || '일정 추가에 실패했습니다.';
-          throw new Error(message);
+          const handled = await handleCalendarError(res, '일정 추가에 실패했습니다.');
+          if (handled) return;
         }
       }
 
@@ -755,19 +805,33 @@ const Invited = () => {
     try {
       const token = ensureValidToken();
       if (!token) return;
-      await joinAppointment(); // 약속 참여 처리
-      await syncWithGoogleCalendar(); // 구글 캘린더 반영
-      const syncResult = await syncMySchedules(); // 내가 참여한 약속 일정 동기화
 
-      if (syncResult) {
-        alert(
-          `총 ${syncResult.total_appointments}개의 약속 중 ${syncResult.updated_count}개를 동기화했어요.\n실패: ${syncResult.failed_count}개`
-        );
+      try {
+        await joinAppointment(); // 약속 참여 처리
+      } catch (e) {
+      alert(e?.message || "약속 참여 중 오류가 발생했어요.");
+      }
+
+      try {
+        await syncWithGoogleCalendar(); // 구글 캘린더 반영
+      } catch (e) {
+        alert(e?.message || "구글 캘린더 동기화 중 오류가 발생했어요.");
+      }
+      try {
+        const syncResult = await syncMySchedules(); // 내가 참여한 약속 일정 동기화
+
+        if (syncResult) {
+          alert(
+            `총 ${syncResult.total_appointments}개의 약속 중 ${syncResult.updated_count}개를 동기화했어요.\n실패: ${syncResult.failed_count}개`
+          );
+        }
+      } catch (e) {
+        alert(e?.message || "일정 재계산 중 오류가 발생했어요.");
       }
 
       navigate(`/result/${code}`);    // 결과 페이지로 이동
     } catch (e) {
-      alert(e?.message || "처리 중 오류가 발생했습니다.");
+      alert(e?.message || "처리 중 오류가 발생했어요.");
     }
   };
 
